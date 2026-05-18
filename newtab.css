@@ -28,7 +28,7 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
   box-shadow:0 0 8px var(--accent); }
 .today { font:13px/1 "JetBrains Mono",ui-monospace,Menlo,monospace; color:var(--muted); }
 .clock { display:flex; flex-direction:column; align-items:center; gap:.5rem;
-  padding:3.5rem 0 2.6rem; }
+  padding:3.5rem 0 3.8rem; }
 .big { font:300 8rem/1 "JetBrains Mono",ui-monospace,Menlo,monospace;
   letter-spacing:-.02em; display:flex; align-items:flex-start; }
 .big .cl { font-style:normal; color:var(--muted); margin:0 .08em; }
@@ -40,7 +40,7 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
   color:var(--accent); letter-spacing:.06em; }
 .cards { display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:1rem; margin-bottom:1.2rem; }
+  gap:1rem; margin-bottom:2.4rem; }
 .card { background:var(--panel); border:1px solid var(--border);
   border-radius:14px; padding:1.1rem 1.2rem 1.2rem; display:flex;
   flex-direction:column; gap:.5rem; }

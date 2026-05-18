@@ -1,17 +1,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { partOfDay, PALETTE } from "../src/dayPart.js";
+import { partOfDay, PALETTE, dotColor } from "../src/dayPart.js";
 
-test("partOfDay buckets hours", () => {
-  assert.equal(partOfDay(2),  "asleep");
-  assert.equal(partOfDay(7),  "morning");
-  assert.equal(partOfDay(12), "work");
-  assert.equal(partOfDay(19), "evening");
-  assert.equal(partOfDay(23), "night");
+// SF-ish summer day: sunrise 05:48 (348), sunset 20:33 (1233)
+test("partOfDay precedence", () => {
+  assert.equal(partOfDay(120, 348, 1233), "night");   // 02:00 pre-dawn
+  assert.equal(partOfDay(360, 348, 1233), "dawn");     // 06:00
+  assert.equal(partOfDay(600, 348, 1233), "work");     // 10:00
+  assert.equal(partOfDay(540, 348, 1233), "work");     // 09:00 boundary
+  assert.equal(partOfDay(1019, 348, 1233), "work");    // 16:59
+  assert.equal(partOfDay(1100, 348, 1233), "evening"); // 18:20
+  assert.equal(partOfDay(1300, 348, 1233), "night");   // 21:40 after sunset
 });
 
-test("every bucket has a palette color", () => {
-  for (const k of ["asleep","morning","work","evening","night"]) {
-    assert.match(PALETTE[k], /^#/);
-  }
+test("winter: sunset before 17:00 → no evening (night after work)", () => {
+  // London Dec: sunrise 08:04 (484), sunset 15:53 (953)
+  assert.equal(partOfDay(1100, 484, 953), "night");
+  assert.equal(partOfDay(700, 484, 953), "work");
+  assert.equal(partOfDay(500, 484, 953), "dawn");
+  assert.equal(partOfDay(400, 484, 953), "night");
+});
+
+test("palette + dotColor", () => {
+  for (const k of ["night","dawn","work","evening"]) assert.match(PALETTE[k], /^#/);
+  assert.match(dotColor("evening"), /^#/);
+  assert.equal(dotColor("work"), dotColor("dawn")); // both cyan/day
+  assert.notEqual(dotColor("night"), dotColor("work"));
 });

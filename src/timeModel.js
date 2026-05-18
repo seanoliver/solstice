@@ -3,15 +3,20 @@ import { daySegments } from "./bands.js";
 import { sunTimesUTC } from "./sun.js";
 
 export function zoneNow(tz, at = new Date()) {
-  const opts = { hour: "numeric", minute: "2-digit", hour12: true };
-  if (tz !== "local") opts.timeZone = tz;
-  const parts = new Intl.DateTimeFormat("en-US", { ...opts, hourCycle: "h23" })
-    .formatToParts(at);
+  const base = {};
+  if (tz !== "local") base.timeZone = tz;
+  // Numeric hour MUST be 24-hour. Do not set hour12 here — hour12 overrides
+  // hourCycle, which previously yielded a 12-hour value (7 instead of 19).
+  const parts = new Intl.DateTimeFormat("en-US", {
+    ...base, hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(at);
   const get = (t) => parts.find((p) => p.type === t)?.value;
   return {
     hour: Number(get("hour")),
     minute: Number(get("minute")),
-    label: new Intl.DateTimeFormat("en-US", opts).format(at),
+    label: new Intl.DateTimeFormat("en-US", {
+      ...base, hour: "numeric", minute: "2-digit", hour12: true,
+    }).format(at),
   };
 }
 

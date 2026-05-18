@@ -14,7 +14,7 @@ Design doc: `~/cortex/wiki/side-projects/2026-05-18-chrome-newtab-design.md`
 
 ## Conventions
 
-- Project root: `~/dev/chrome-newtab/` (git already initialized).
+- Project root: `~/code/projects/chrome-newtab/` (git already initialized).
 - All source files are ES modules (`import`/`export`); no bundler.
 - Pure logic lives in `src/` and is imported by both the page and tests.
 - Run all tests: `node --test` from project root.
@@ -25,9 +25,9 @@ Design doc: `~/cortex/wiki/side-projects/2026-05-18-chrome-newtab-design.md`
 ### Task 1: Project scaffold + manifest + blank new tab loads
 
 **Files:**
-- Create: `~/dev/chrome-newtab/manifest.json`
-- Create: `~/dev/chrome-newtab/newtab.html`
-- Create: `~/dev/chrome-newtab/.gitignore`
+- Create: `~/code/projects/chrome-newtab/manifest.json`
+- Create: `~/code/projects/chrome-newtab/newtab.html`
+- Create: `~/code/projects/chrome-newtab/.gitignore`
 
 **Step 1:** Write `.gitignore`:
 ```
@@ -63,11 +63,11 @@ node_modules/
 </html>
 ```
 
-**Step 4: Manual verify.** In Chrome: `chrome://extensions` → Developer mode → Load unpacked → select `~/dev/chrome-newtab`. Open a new tab. Expected: blank page titled "Timezones", no console errors except missing `newtab.css`/`newtab.js` (created later). Confirm the override works.
+**Step 4: Manual verify.** In Chrome: `chrome://extensions` → Developer mode → Load unpacked → select `~/code/projects/chrome-newtab`. Open a new tab. Expected: blank page titled "Timezones", no console errors except missing `newtab.css`/`newtab.js` (created later). Confirm the override works.
 
 **Step 5: Commit**
 ```bash
-cd ~/dev/chrome-newtab
+cd ~/code/projects/chrome-newtab
 git add manifest.json newtab.html .gitignore
 git commit -m "feat: MV3 scaffold overriding new tab"
 ```
@@ -77,7 +77,7 @@ git commit -m "feat: MV3 scaffold overriding new tab"
 ### Task 2: Zone config
 
 **Files:**
-- Create: `~/dev/chrome-newtab/config.js`
+- Create: `~/code/projects/chrome-newtab/config.js`
 
 **Step 1:** Write `config.js` (hand-editable, order = display order; `local: true` resolves to the browser's zone):
 ```js
@@ -102,8 +102,8 @@ git add config.js && git commit -m "feat: timezone config list"
 ### Task 3: Time model — `zoneNow()` (TDD)
 
 **Files:**
-- Create: `~/dev/chrome-newtab/src/timeModel.js`
-- Test: `~/dev/chrome-newtab/test/timeModel.test.js`
+- Create: `~/code/projects/chrome-newtab/src/timeModel.js`
+- Test: `~/code/projects/chrome-newtab/test/timeModel.test.js`
 
 **Step 1: Write the failing test.**
 ```js
@@ -128,7 +128,7 @@ test("zoneNow resolves 'local' without throwing", () => {
 ```
 
 **Step 2: Run, verify it fails.**
-Run: `cd ~/dev/chrome-newtab && node --test`
+Run: `cd ~/code/projects/chrome-newtab && node --test`
 Expected: FAIL — `zoneNow` not exported.
 
 **Step 3: Implement minimal code in `src/timeModel.js`.**
@@ -162,8 +162,8 @@ git commit -m "feat: zoneNow time model + tests"
 ### Task 4: Day-part bucketing + palette (TDD)
 
 **Files:**
-- Create: `~/dev/chrome-newtab/src/dayPart.js`
-- Test: `~/dev/chrome-newtab/test/dayPart.test.js`
+- Create: `~/code/projects/chrome-newtab/src/dayPart.js`
+- Test: `~/code/projects/chrome-newtab/test/dayPart.test.js`
 
 **Step 1: Failing test.**
 ```js
@@ -220,8 +220,8 @@ git commit -m "feat: day-part bucketing + shared palette"
 ### Task 5: Build the model array helper (TDD)
 
 **Files:**
-- Modify: `~/dev/chrome-newtab/src/timeModel.js`
-- Modify: `~/dev/chrome-newtab/test/timeModel.test.js`
+- Modify: `~/code/projects/chrome-newtab/src/timeModel.js`
+- Modify: `~/code/projects/chrome-newtab/test/timeModel.test.js`
 
 **Step 1: Add failing test.**
 ```js
@@ -264,8 +264,8 @@ git commit -m "feat: buildModel zone-row builder"
 ### Task 6: Renderer interface + Digits view
 
 **Files:**
-- Create: `~/dev/chrome-newtab/views/digits.js`
-- Create: `~/dev/chrome-newtab/newtab.css`
+- Create: `~/code/projects/chrome-newtab/views/digits.js`
+- Create: `~/code/projects/chrome-newtab/newtab.css`
 
 **Step 1:** Write `views/digits.js` (renderer signature `render(model, el)` used by all views):
 ```js
@@ -319,8 +319,8 @@ git commit -m "feat: renderer interface + digits view + base css"
 ### Task 7: Timeline view
 
 **Files:**
-- Create: `~/dev/chrome-newtab/views/timeline.js`
-- Modify: `~/dev/chrome-newtab/newtab.css`
+- Create: `~/code/projects/chrome-newtab/views/timeline.js`
+- Modify: `~/code/projects/chrome-newtab/newtab.css`
 
 **Step 1:** Write `views/timeline.js`. Each row is a 24-cell bar; cell color = `partOfDay(cellHour)`; a NOW marker is positioned at `(hour*60+minute)/1440`.
 ```js
@@ -384,8 +384,8 @@ git commit -m "feat: timeline view"
 ### Task 8: Dials view
 
 **Files:**
-- Create: `~/dev/chrome-newtab/views/dials.js`
-- Modify: `~/dev/chrome-newtab/newtab.css`
+- Create: `~/code/projects/chrome-newtab/views/dials.js`
+- Modify: `~/code/projects/chrome-newtab/newtab.css`
 
 **Step 1:** Write `views/dials.js` — one small SVG clock per zone (12h face, hour+minute hand, tint by part). Grid of dials keeps it scannable.
 ```js
@@ -444,7 +444,7 @@ git commit -m "feat: dials view"
 ### Task 9: Wire app — toggle, persistence, tick loop
 
 **Files:**
-- Create: `~/dev/chrome-newtab/newtab.js`
+- Create: `~/code/projects/chrome-newtab/newtab.js`
 
 **Step 1:** Write `newtab.js`:
 ```js
@@ -505,7 +505,7 @@ git commit -m "feat: app wiring, view toggle, persistence, tick loop"
 ### Task 10: README + final QA pass
 
 **Files:**
-- Create: `~/dev/chrome-newtab/README.md`
+- Create: `~/code/projects/chrome-newtab/README.md`
 
 **Step 1:** Write `README.md`: what it is, how to load unpacked, how to edit `config.js` to change zones/order, `node --test` to run tests.
 

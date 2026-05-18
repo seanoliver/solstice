@@ -1,6 +1,24 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { zoneNow, buildModel } from "../src/timeModel.js";
+import { zoneNow, buildModel, ymdNumber } from "../src/timeModel.js";
+
+test("ymdNumber day difference is tz-correct and system-independent", () => {
+  const at = new Date("2026-05-18T18:15:00Z"); // SGP already May 19, LA still May 18
+  const diff = ymdNumber(at, "Asia/Singapore") - ymdNumber(at, "America/Los_Angeles");
+  assert.equal(diff, 1);
+});
+
+test("buildModel dayOffset: westward same day, eastward +1 (relative offsets)", () => {
+  const at = new Date("2026-05-18T18:15:00Z");
+  const zones = [
+    { label: "LA",  tz: "America/Los_Angeles", lat: 37.77,  lon: -122.42 },
+    { label: "SYD", tz: "Australia/Sydney",    lat: -33.87, lon: 151.21  },
+  ];
+  const [la, syd] = buildModel(zones, at);
+  assert.equal(typeof la.dayOffset, "number");
+  // Sydney (May 19) is one calendar day ahead of LA (May 18).
+  assert.equal(syd.dayOffset - la.dayOffset, 1);
+});
 
 test("zoneNow returns hour/minute/label for a fixed instant", () => {
   const r = zoneNow("America/Los_Angeles", new Date("2026-05-18T19:00:00Z"));

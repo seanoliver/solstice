@@ -42,7 +42,17 @@ function tzAbbrev(date, tz) {
   return p.find((x) => x.type === "timeZoneName")?.value ?? "";
 }
 
+// Integer day number for `date` as observed in `tz` (system-independent).
+export function ymdNumber(date, tz) {
+  const opts = { year: "numeric", month: "2-digit", day: "2-digit" };
+  if (tz !== "local") opts.timeZone = tz;
+  const p = new Intl.DateTimeFormat("en-CA", opts).formatToParts(date);
+  const g = (t) => Number(p.find((x) => x.type === t)?.value);
+  return Math.floor(Date.UTC(g("year"), g("month") - 1, g("day")) / 86400000);
+}
+
 export function buildModel(zones, at = new Date()) {
+  const localNum = ymdNumber(at, "local");
   return zones.map((z) => {
     const { hour, minute, label } = zoneNow(z.tz, at);
     const minutesOfDay = hour * 60 + minute;
@@ -61,6 +71,7 @@ export function buildModel(zones, at = new Date()) {
       dayProgress: minutesOfDay / 1440,
       dateLabel: dateLabel(at, z.tz),
       tzAbbrev: tzAbbrev(at, z.tz),
+      dayOffset: ymdNumber(at, z.tz) - localNum,
     };
   });
 }

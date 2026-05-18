@@ -93,6 +93,14 @@ export function render(model, root, now) {
     time.textContent =
       String(r.hour).padStart(2, "0") + ":" +
       String(r.minute).padStart(2, "0");
+    if (r.dayOffset !== 0) {
+      const chip = document.createElement("span");
+      chip.className = "tlday";
+      chip.textContent =
+        (r.dayOffset > 0 ? "+" : "−") + Math.abs(r.dayOffset);
+      chip.title = r.dateLabel;
+      time.appendChild(chip);
+    }
     row.append(lab, stripEl(r, true), time);
     tl.appendChild(row);
   }

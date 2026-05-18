@@ -19,6 +19,15 @@ tested time-model approach carries over.
   4. 24-hour timeline: one banded row per zone + a current-time dot.
   5. Color key / legend (replaces freed space from removed views).
 
+## Cross-day indicator
+
+- Each zone row in the 24h timeline shows a muted `±N` chip after its time
+  when that zone's current calendar date differs from the local date
+  (`dayOffset` in the model = zone day number − local day number, via
+  `ymdNumber`). Same-day rows show nothing, so when every zone shares the
+  local date there is no day UI at all (the conditional requirement). Chip
+  `title` carries the full date for hover.
+
 ## Day/night + bands
 
 - Sunrise/sunset computed **offline** via standard NOAA solar formula from

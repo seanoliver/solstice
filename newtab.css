@@ -10,12 +10,12 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
    fixed legend; topbar stays pinned at the top. */
 .live .clock { margin-top:auto; }
 .live .timeline { margin-bottom:auto; }
-.kicker { font:600 12px/1 ui-monospace,Menlo,monospace; letter-spacing:.18em;
+.kicker { font:500 12px/1 ui-monospace,Menlo,monospace; letter-spacing:.18em;
   color:var(--muted); text-transform:uppercase; }
 .topbar { display:flex; justify-content:space-between; align-items:center;
   padding-bottom:1.2rem; border-bottom:1px solid var(--border); }
 .brand { display:flex; align-items:center; gap:.55rem;
-  font:600 13px/1 ui-monospace,Menlo,monospace; letter-spacing:.18em;
+  font:500 13px/1 ui-monospace,Menlo,monospace; letter-spacing:.18em;
   color:var(--muted); }
 .brand i { width:7px; height:7px; border-radius:50%; background:var(--accent);
   box-shadow:0 0 8px var(--accent); }
@@ -41,11 +41,11 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
   background:radial-gradient(130% 130% at 0% 0%,#0e2b29,var(--panel)); }
 .card-head { display:flex; justify-content:space-between;
   align-items:center; }
-.abbr { font:600 12px/1 ui-monospace,Menlo,monospace; letter-spacing:.12em;
+.abbr { font:500 12px/1 ui-monospace,Menlo,monospace; letter-spacing:.12em;
   color:var(--muted); }
 .card-local .abbr { color:var(--accent); }
 .dot { width:9px; height:9px; border-radius:50%; }
-.city { font-size:1.05rem; font-weight:600; }
+.city { font-size:1.05rem; font-weight:500; }
 .card-time { font:300 2.4rem/1 ui-monospace,"SF Mono",Menlo,monospace; }
 .card-time sub { font-size:.85rem; color:var(--muted); bottom:0;
   margin-left:.25rem; }
@@ -92,7 +92,7 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
   gap:.6rem; padding:.78rem 0; }
 .edit-toggle { background:transparent; color:var(--muted);
   border:1px solid var(--border); border-radius:999px;
-  padding:.35rem .9rem; font:600 11px/1 ui-monospace,Menlo,monospace;
+  padding:.35rem .9rem; font:500 11px/1 ui-monospace,Menlo,monospace;
   letter-spacing:.14em; text-transform:uppercase; cursor:pointer; }
 .edit-toggle.on { color:var(--accent); border-color:#1d6f67; }
 .card { position:relative; }

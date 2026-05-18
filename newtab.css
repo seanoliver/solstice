@@ -58,10 +58,15 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .tlrow { display:grid; grid-template-columns:5rem 1fr 5.8rem;
   align-items:center; gap:1rem; padding:.34rem 0; }
 .tllab { font:12px/1 ui-monospace,Menlo,monospace; color:var(--muted); }
+.tlend { display:flex; align-items:center; justify-content:flex-end;
+  gap:.45rem; }
 .tltime { font:12px/1 ui-monospace,Menlo,monospace; color:var(--muted);
-  text-align:right; }
-.tltime .tlday { margin-left:.4rem; padding:.1rem .32rem; border-radius:4px;
-  background:#1b2230; color:#9aa4b2; font-size:10px; letter-spacing:.02em; }
+  font-variant-numeric:tabular-nums; }
+.tlday { display:inline-block; min-width:1.7rem; text-align:center;
+  font:10px/1 ui-monospace,Menlo,monospace; letter-spacing:.02em;
+  color:transparent; }
+.tlday.on { padding:.12rem .32rem; border-radius:4px;
+  background:#1b2230; color:#9aa4b2; }
 .legend { position:fixed; left:0; right:0; bottom:0; margin:0;
   border:0; border-top:1px solid var(--border); border-radius:0;
   background:var(--panel); padding:.95rem 1.6rem; }

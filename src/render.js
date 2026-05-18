@@ -88,20 +88,23 @@ export function render(model, root, now) {
     const lab = document.createElement("span");
     lab.className = "tllab";
     lab.textContent = r.label;
+    const end = document.createElement("span");
+    end.className = "tlend";
     const time = document.createElement("span");
     time.className = "tltime";
     time.textContent =
       String(r.hour).padStart(2, "0") + ":" +
       String(r.minute).padStart(2, "0");
+    const chip = document.createElement("span");
+    chip.className = "tlday"; // always present → reserves constant width
     if (r.dayOffset !== 0) {
-      const chip = document.createElement("span");
-      chip.className = "tlday";
+      chip.classList.add("on");
       chip.textContent =
         (r.dayOffset > 0 ? "+" : "−") + Math.abs(r.dayOffset);
       chip.title = r.dateLabel;
-      time.appendChild(chip);
     }
-    row.append(lab, stripEl(r, true), time);
+    end.append(time, chip);
+    row.append(lab, stripEl(r, true), end);
     tl.appendChild(row);
   }
   root.appendChild(tl);

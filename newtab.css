@@ -25,11 +25,12 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .big { font:300 8rem/1 ui-monospace,"SF Mono",Menlo,monospace;
   letter-spacing:-.02em; display:flex; align-items:flex-start; }
 .big .cl { font-style:normal; color:var(--muted); margin:0 .08em; }
-.big .rt { display:flex; flex-direction:column; align-items:flex-start;
-  justify-content:flex-end; margin:0 0 1.1rem .45rem; }
+.big .rt { align-self:stretch; display:flex; flex-direction:column;
+  align-items:flex-start; justify-content:space-between;
+  margin:0 0 0 .6rem; padding:.55rem 0 .95rem; }
 .big .ap { font-size:1.4rem; color:var(--muted); }
 .big .secs { font:.95rem/1 ui-monospace,Menlo,monospace;
-  color:var(--accent); margin-bottom:.2rem; }
+  color:var(--accent); }
 .cards { display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:1rem; margin-bottom:1.2rem; }

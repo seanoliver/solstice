@@ -24,7 +24,7 @@ function stripEl(row, tall) {
   return strip;
 }
 
-export function render(model, root, now) {
+export function renderLive(model, liveEl, now) {
   const local = model.find((r) => r.tz === "local") || model[0];
   const t = splitTime(local.label2);
   const ss = String(now.getSeconds()).padStart(2, "0");
@@ -32,15 +32,15 @@ export function render(model, root, now) {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
   }).format(now);
 
-  root.innerHTML = "";
-  root.className = "wt";
+  liveEl.innerHTML = "";
+  liveEl.className = "live wt";
 
   const top = document.createElement("header");
   top.className = "topbar";
   top.innerHTML =
     `<span class="brand"><i></i>WORLD TIME</span>` +
     `<span class="today">${dateStr}</span>`;
-  root.appendChild(top);
+  liveEl.appendChild(top);
 
   const clock = document.createElement("section");
   clock.className = "clock";
@@ -49,7 +49,7 @@ export function render(model, root, now) {
     `<div class="big">${t.hm.replace(":", '<i class="cl">:</i>')}` +
     `<sub class="ap">${t.ap}</sub></div>` +
     `<div class="secs">:${ss}</div>`;
-  root.appendChild(clock);
+  liveEl.appendChild(clock);
 
   const cards = document.createElement("section");
   cards.className = "cards";
@@ -74,7 +74,7 @@ export function render(model, root, now) {
     c.append(head, city, time, date, stripEl(r, false));
     cards.appendChild(c);
   }
-  root.appendChild(cards);
+  liveEl.appendChild(cards);
 
   const tl = document.createElement("section");
   tl.className = "panel timeline";
@@ -107,7 +107,7 @@ export function render(model, root, now) {
     row.append(lab, stripEl(r, true), end);
     tl.appendChild(row);
   }
-  root.appendChild(tl);
+  liveEl.appendChild(tl);
 
   const leg = document.createElement("section");
   leg.className = "panel legend";
@@ -120,5 +120,5 @@ export function render(model, root, now) {
     `<span><i class="kd" style="background:#22d3ee"></i>day</span>` +
     `<span><i class="kd" style="background:#5b6675"></i>night</span>` +
     `</div>`;
-  root.appendChild(leg);
+  liveEl.appendChild(leg);
 }

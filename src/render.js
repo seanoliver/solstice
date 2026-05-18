@@ -98,8 +98,8 @@ export function renderLive(model, liveEl, now, ctx) {
   clock.innerHTML =
     `<div class="kicker">LOCAL TIME</div>` +
     `<div class="big">${t.hm.replace(":", '<i class="cl">:</i>')}` +
-    `<sub class="ap">${t.ap}</sub></div>` +
-    `<div class="secs">:${ss}</div>`;
+    `<span class="rt"><span class="secs">:${ss}</span>` +
+    `<sub class="ap">${t.ap}</sub></span></div>`;
   liveEl.appendChild(clock);
 
   const cards = document.createElement("section");

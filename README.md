@@ -69,6 +69,7 @@ node --test
   wiring (tick loop).
 - `config.js` — the first-run default `ZONES` list (`{ label, tz, lat, lon }`).
 - `cities.js` — bundled searchable city dataset (`{ name, tz, lat, lon }`).
+- `assets/fonts/` — bundled JetBrains Mono variable woff2 (offline, OFL).
 - `src/` — `timeModel.js` (zone-row builder), `sun.js` (offline NOAA
   sunrise/sunset), `bands.js` (day-part band segments), `dayPart.js`
   (day-part bucketing + shared palette), `zones.js` (localStorage zone

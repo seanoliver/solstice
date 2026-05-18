@@ -27,11 +27,52 @@ function stripEl(row, tall) {
 export function renderEditBar(barEl, ctx) {
   barEl.innerHTML = "";
   barEl.className = "editbar";
+
   const toggle = document.createElement("button");
   toggle.className = "edit-toggle" + (ctx.editMode ? " on" : "");
   toggle.textContent = ctx.editMode ? "Done" : "Edit";
   toggle.addEventListener("click", () => ctx.onToggle());
   barEl.appendChild(toggle);
+
+  if (!ctx.editMode) return;
+
+  const panel = document.createElement("div");
+  panel.className = "addbox";
+  const input = document.createElement("input");
+  input.type = "text";
+  input.placeholder = "Add a city…";
+  input.value = ctx.query;
+  input.addEventListener("input", (e) => ctx.onQuery(e.target.value));
+  panel.appendChild(input);
+
+  const q = ctx.query.trim().toLowerCase();
+  if (q) {
+    const results = ctx.cities
+      .filter((c) => c.name.toLowerCase().includes(q))
+      .slice(0, 8);
+    const ul = document.createElement("ul");
+    ul.className = "results";
+    for (const c of results) {
+      const li = document.createElement("li");
+      li.textContent = c.name + "  ·  " + c.tz;
+      li.addEventListener("click", () => ctx.onAdd(c));
+      ul.appendChild(li);
+    }
+    if (!results.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "No match";
+      ul.appendChild(li);
+    }
+    panel.appendChild(ul);
+  }
+  barEl.appendChild(panel);
+
+  if (ctx.focusSearch) {
+    input.focus();
+    const n = input.value.length;
+    input.setSelectionRange(n, n);
+  }
 }
 
 export function renderLive(model, liveEl, now, ctx) {

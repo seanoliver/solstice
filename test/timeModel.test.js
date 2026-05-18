@@ -2,6 +2,13 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { zoneNow, buildModel, ymdNumber, cityFromTz } from "../src/timeModel.js";
 
+test("buildModel uses the localLabel override for the local zone", () => {
+  const zones = [{ label: "You", tz: "local", lat: 37.77, lon: -122.42 }];
+  const row = buildModel(zones, new Date("2026-05-18T19:00:00Z"),
+    "San Francisco")[0];
+  assert.equal(row.label, "San Francisco");
+});
+
 test("cityFromTz turns an IANA zone into a city label", () => {
   assert.equal(cityFromTz("America/Los_Angeles"), "Los Angeles");
   assert.equal(cityFromTz("Europe/London"), "London");

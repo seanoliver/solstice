@@ -1,7 +1,9 @@
 # World Time New Tab
 
-A zero-permission Chrome MV3 extension that replaces the new-tab page with a
-single, muted, modern world-clock. One page shows:
+A near-zero-permission Chrome MV3 extension that replaces the new-tab page
+with a single, muted, modern world-clock. The only permission is one
+`host_permissions` entry for optional IP-based local-city detection
+(`https://ipapi.co/*`); everything else is offline. One page shows:
 
 - a big local clock,
 - per-zone cards with day-part-banded progress bars,
@@ -9,13 +11,19 @@ single, muted, modern world-clock. One page shows:
 - a color key.
 
 Sunrise and sunset are computed offline (NOAA algorithm) from each zone's
-latitude/longitude in `config.js` — no network, no permissions. Each day is
-banded into four parts:
+latitude/longitude in `config.js`. Each day is banded into four parts:
 
 - **Morning** — sunrise → 9am
 - **Work** — 9am → 5pm
 - **Evening** — 5pm → sunset
 - **Night**
+
+The local card is labeled by city: it tries IP geolocation once
+(`ipapi.co`, result cached in `localStorage` for a day, refreshed when
+stale), and falls back to the machine timezone's city (e.g.
+`America/Los_Angeles` → "Los Angeles") if the network/API is unavailable.
+The page always renders the timezone city immediately and silently upgrades
+to the IP city when it resolves — no blocking, no failure surfaced.
 
 ## Install
 
@@ -73,7 +81,7 @@ node --test
 - `src/` — `timeModel.js` (zone-row builder), `sun.js` (offline NOAA
   sunrise/sunset), `bands.js` (day-part band segments), `dayPart.js`
   (day-part bucketing + shared palette), `zones.js` (localStorage zone
-  store: seed/add/remove, local pinned), and `render.js` (single-page
-  renderer + edit bar).
+  store: seed/add/remove, local pinned), `geo.js` (cached IP city lookup
+  with offline fallback), and `render.js` (single-page renderer + edit bar).
 - `test/` — `node:test` unit suites.
 - `docs/plans/` — implementation plan.

@@ -1,6 +1,7 @@
 import { buildModel } from "./src/timeModel.js";
 import { renderLive, renderEditBar } from "./src/render.js";
 import { loadZones, saveZones, addZone, removeZone } from "./src/zones.js";
+import { readCachedCity, writeCachedCity, fetchCity } from "./src/geo.js";
 import { CITIES } from "./cities.js";
 
 const app = document.getElementById("app");
@@ -13,6 +14,7 @@ let zones = loadZones(store);
 let editMode = false;
 let query = "";
 let focusSearch = false;
+let geoCity = readCachedCity(store); // null if absent/stale → triggers refresh
 
 function ctx() {
   return {
@@ -42,9 +44,21 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 
 function tick() {
   const now = new Date();
-  renderLive(buildModel(zones, now), live, now, ctx());
+  renderLive(buildModel(zones, now, geoCity), live, now, ctx());
+}
+
+// Render immediately with the timezone city; upgrade to the IP city when
+// the cache is missing/stale and the network resolves. Failure is silent.
+async function refreshGeo() {
+  const city = await fetchCity();
+  if (city && city !== geoCity) {
+    geoCity = city;
+    writeCachedCity(store, city);
+    tick();
+  }
 }
 
 paintBar();
 tick();
 setInterval(tick, 1000);
+if (!geoCity) refreshGeo();

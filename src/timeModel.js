@@ -57,10 +57,10 @@ export function cityFromTz(tz) {
   return seg.replace(/_/g, " ");
 }
 
-export function buildModel(zones, at = new Date()) {
+export function buildModel(zones, at = new Date(), localLabel = null) {
   const localNum = ymdNumber(at, "local");
-  const localCity = cityFromTz(
-    new Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const localCity = localLabel
+    || cityFromTz(new Intl.DateTimeFormat().resolvedOptions().timeZone);
   return zones.map((z) => {
     const { hour, minute, label } = zoneNow(z.tz, at);
     const minutesOfDay = hour * 60 + minute;

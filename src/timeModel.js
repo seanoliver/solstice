@@ -51,8 +51,16 @@ export function ymdNumber(date, tz) {
   return Math.floor(Date.UTC(g("year"), g("month") - 1, g("day")) / 86400000);
 }
 
+// "America/Los_Angeles" → "Los Angeles"; multi-segment uses the last part.
+export function cityFromTz(tz) {
+  const seg = String(tz).split("/").pop() || String(tz);
+  return seg.replace(/_/g, " ");
+}
+
 export function buildModel(zones, at = new Date()) {
   const localNum = ymdNumber(at, "local");
+  const localCity = cityFromTz(
+    new Intl.DateTimeFormat().resolvedOptions().timeZone);
   return zones.map((z) => {
     const { hour, minute, label } = zoneNow(z.tz, at);
     const minutesOfDay = hour * 60 + minute;
@@ -64,7 +72,7 @@ export function buildModel(zones, at = new Date()) {
     } else if (sun.polar === "night") { sunriseMin = 1441; sunsetMin = 1441; }
     const part = partOfDay(minutesOfDay, sunriseMin, sunsetMin);
     return {
-      label: z.label, tz: z.tz,
+      label: z.tz === "local" ? localCity : z.label, tz: z.tz,
       hour, minute, label2: label,
       minutesOfDay, sunriseMin, sunsetMin, part,
       segments: daySegments(sunriseMin, sunsetMin),

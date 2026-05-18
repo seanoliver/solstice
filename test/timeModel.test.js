@@ -1,6 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { zoneNow, buildModel, ymdNumber } from "../src/timeModel.js";
+import { zoneNow, buildModel, ymdNumber, cityFromTz } from "../src/timeModel.js";
+
+test("cityFromTz turns an IANA zone into a city label", () => {
+  assert.equal(cityFromTz("America/Los_Angeles"), "Los Angeles");
+  assert.equal(cityFromTz("Europe/London"), "London");
+  assert.equal(cityFromTz("America/Argentina/Buenos_Aires"), "Buenos Aires");
+  assert.equal(cityFromTz("UTC"), "UTC");
+});
 
 test("ymdNumber day difference is tz-correct and system-independent", () => {
   const at = new Date("2026-05-18T18:15:00Z"); // SGP already May 19, LA still May 18

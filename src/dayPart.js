@@ -12,8 +12,3 @@ export function partOfDay(min, sunriseMin, sunsetMin) {
   if (min >= 1020 && min < sunsetMin) return "evening";
   return "night";
 }
-
-export function dotColor(part) {
-  if (part === "night") return "#5b6675"; // dim
-  return "#22d3ee";                        // cyan day (morning/work/evening)
-}

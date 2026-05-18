@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { partOfDay, PALETTE, dotColor } from "../src/dayPart.js";
+import { partOfDay, PALETTE } from "../src/dayPart.js";
 
 // SF-ish summer day: sunrise 05:48 (348), sunset 20:33 (1233)
 test("partOfDay precedence", () => {
@@ -21,9 +21,6 @@ test("winter: sunset before 17:00 → no evening (night after work)", () => {
   assert.equal(partOfDay(400, 484, 953), "night");
 });
 
-test("palette + dotColor", () => {
+test("palette has a color for every day-part", () => {
   for (const k of ["night","morning","work","evening"]) assert.match(PALETTE[k], /^#/);
-  assert.match(dotColor("evening"), /^#/);
-  assert.equal(dotColor("work"), dotColor("morning")); // both cyan/day
-  assert.notEqual(dotColor("night"), dotColor("work"));
 });

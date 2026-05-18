@@ -1,4 +1,4 @@
-import { PALETTE, dotColor } from "./dayPart.js";
+import { PALETTE } from "./dayPart.js";
 
 function splitTime(label2) {
   const parts = String(label2).trim().split(/\s+/); // handles NNBSP from Intl
@@ -19,7 +19,7 @@ function stripEl(row, tall) {
   const m = document.createElement("i");
   m.className = "marker";
   m.style.left = row.dayProgress * 100 + "%";
-  m.style.background = dotColor(row.part);
+  m.style.background = PALETTE[row.part];
   strip.appendChild(m);
   return strip;
 }
@@ -112,7 +112,7 @@ export function renderLive(model, liveEl, now, ctx) {
     head.className = "card-head";
     head.innerHTML =
       `<span class="abbr">${r.tzAbbrev}</span>` +
-      `<i class="dot" style="background:${dotColor(r.part)}"></i>`;
+      `<i class="dot" style="background:${PALETTE[r.part]}"></i>`;
     const city = document.createElement("div");
     city.className = "city";
     city.textContent = r.label;
@@ -177,8 +177,6 @@ export function renderLive(model, liveEl, now, ctx) {
     `<span><i style="background:${PALETTE.work}"></i>Work</span>` +
     `<span><i style="background:${PALETTE.evening}"></i>Evening</span>` +
     `<span><i style="background:${PALETTE.night}"></i>Night</span>` +
-    `<span><i class="kd" style="background:#22d3ee"></i>day</span>` +
-    `<span><i class="kd" style="background:#5b6675"></i>night</span>` +
     `</div>`;
   liveEl.appendChild(leg);
 }

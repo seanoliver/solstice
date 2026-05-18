@@ -24,7 +24,17 @@ function stripEl(row, tall) {
   return strip;
 }
 
-export function renderLive(model, liveEl, now) {
+export function renderEditBar(barEl, ctx) {
+  barEl.innerHTML = "";
+  barEl.className = "editbar";
+  const toggle = document.createElement("button");
+  toggle.className = "edit-toggle" + (ctx.editMode ? " on" : "");
+  toggle.textContent = ctx.editMode ? "Done" : "Edit";
+  toggle.addEventListener("click", () => ctx.onToggle());
+  barEl.appendChild(toggle);
+}
+
+export function renderLive(model, liveEl, now, ctx) {
   const local = model.find((r) => r.tz === "local") || model[0];
   const t = splitTime(local.label2);
   const ss = String(now.getSeconds()).padStart(2, "0");
@@ -72,6 +82,15 @@ export function renderLive(model, liveEl, now) {
     date.className = "card-date";
     date.textContent = r.dateLabel;
     c.append(head, city, time, date, stripEl(r, false));
+    if (ctx && ctx.editMode && r.tz !== "local") {
+      const x = document.createElement("button");
+      x.className = "card-x";
+      x.textContent = "×";
+      x.title = "Remove";
+      x.addEventListener("click", () => ctx.onRemove(r));
+      c.appendChild(x);
+      c.classList.add("editing");
+    }
     cards.appendChild(c);
   }
   liveEl.appendChild(cards);

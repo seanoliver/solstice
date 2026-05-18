@@ -12,10 +12,10 @@ Sunrise and sunset are computed offline (NOAA algorithm) from each zone's
 latitude/longitude in `config.js` — no network, no permissions. Each day is
 banded into four parts:
 
-- **Night**
-- **Dawn** — sunrise → 9am
+- **Morning** — sunrise → 9am
 - **Work** — 9am → 5pm
 - **Evening** — 5pm → sunset
+- **Night**
 
 ## Install
 
@@ -24,9 +24,23 @@ banded into four parts:
 3. Click **Load unpacked** and select the project root.
 4. Open a new tab.
 
-## Configure
+## Add / remove cities
 
-Edit `config.js`. The `ZONES` array holds one entry per zone:
+Click **Edit** (top-right) to enter edit mode: each card except your local
+"You" zone gets an **×** to remove it, and an **Add a city…** search box
+appears — type a name, click a result. Click **Done** to return to the calm
+default view. Your zone list persists in `localStorage` across new tabs and
+restarts. The local zone is pinned and cannot be removed.
+
+The searchable city list lives in `cities.js` (`{ name, tz, lat, lon }`);
+append rows to extend it.
+
+## Configure (defaults)
+
+`config.js` `ZONES` is only the **first-run seed** — once you've edited the
+list via the UI, `localStorage` is the source of truth. To change the
+out-of-box defaults (or reset: clear the `zones` key in `localStorage`),
+edit `config.js`:
 
 ```js
 export const ZONES = [
@@ -53,10 +67,12 @@ node --test
 - `manifest.json` — MV3 manifest, overrides the new-tab page.
 - `newtab.html` / `newtab.css` / `newtab.js` — page markup, styles, and app
   wiring (tick loop).
-- `config.js` — the `ZONES` list (`{ label, tz, lat, lon }`).
+- `config.js` — the first-run default `ZONES` list (`{ label, tz, lat, lon }`).
+- `cities.js` — bundled searchable city dataset (`{ name, tz, lat, lon }`).
 - `src/` — `timeModel.js` (zone-row builder), `sun.js` (offline NOAA
   sunrise/sunset), `bands.js` (day-part band segments), `dayPart.js`
-  (day-part bucketing + shared palette), and `render.js` (single-page
-  renderer).
+  (day-part bucketing + shared palette), `zones.js` (localStorage zone
+  store: seed/add/remove, local pinned), and `render.js` (single-page
+  renderer + edit bar).
 - `test/` — `node:test` unit suites.
 - `docs/plans/` — implementation plan.

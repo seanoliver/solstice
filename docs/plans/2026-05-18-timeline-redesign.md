@@ -33,8 +33,16 @@ tested time-model approach carries over.
 - Sunrise/sunset computed **offline** via standard NOAA solar formula from
   each zone's `lat`/`lon`. No network, no permissions, season-correct.
 - `config.js` zones are now `{ label, tz, lat, lon }`. Engine is fully
-  general: any user-added city with coords works automatically. A
-  name→coords city picker is a **future enhancement**, not built now.
+  general: any user-added city with coords works automatically.
+
+## Add / remove zones (shipped 2026-05-18)
+
+- The name→coords city picker (previously deferred) was built: an Edit-mode
+  toggle reveals per-card `×` removal and an add-city search over a bundled
+  `cities.js` dataset; zones persist in `localStorage` via `src/zones.js`
+  (`config.js` becomes the first-run seed; local zone pinned).
+- Design: `docs/plans/2026-05-18-add-remove-zones-design.md`.
+  Plan: `docs/plans/2026-05-18-add-remove-zones.md`.
 - Band precedence per time `t` (first match wins):
   1. `09:00–17:00` → **Work** (fixed 9-5)
   2. `sunrise ≤ t < 09:00` → **Dawn** (lit, pre-work)

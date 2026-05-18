@@ -4,8 +4,8 @@ import { partOfDay, PALETTE, dotColor } from "../src/dayPart.js";
 
 // SF-ish summer day: sunrise 05:48 (348), sunset 20:33 (1233)
 test("partOfDay precedence", () => {
-  assert.equal(partOfDay(120, 348, 1233), "night");   // 02:00 pre-dawn
-  assert.equal(partOfDay(360, 348, 1233), "dawn");     // 06:00
+  assert.equal(partOfDay(120, 348, 1233), "night");   // 02:00 pre-morning
+  assert.equal(partOfDay(360, 348, 1233), "morning");     // 06:00
   assert.equal(partOfDay(600, 348, 1233), "work");     // 10:00
   assert.equal(partOfDay(540, 348, 1233), "work");     // 09:00 boundary
   assert.equal(partOfDay(1019, 348, 1233), "work");    // 16:59
@@ -17,13 +17,13 @@ test("winter: sunset before 17:00 → no evening (night after work)", () => {
   // London Dec: sunrise 08:04 (484), sunset 15:53 (953)
   assert.equal(partOfDay(1100, 484, 953), "night");
   assert.equal(partOfDay(700, 484, 953), "work");
-  assert.equal(partOfDay(500, 484, 953), "dawn");
+  assert.equal(partOfDay(500, 484, 953), "morning");
   assert.equal(partOfDay(400, 484, 953), "night");
 });
 
 test("palette + dotColor", () => {
-  for (const k of ["night","dawn","work","evening"]) assert.match(PALETTE[k], /^#/);
+  for (const k of ["night","morning","work","evening"]) assert.match(PALETTE[k], /^#/);
   assert.match(dotColor("evening"), /^#/);
-  assert.equal(dotColor("work"), dotColor("dawn")); // both cyan/day
+  assert.equal(dotColor("work"), dotColor("morning")); // both cyan/day
   assert.notEqual(dotColor("night"), dotColor("work"));
 });

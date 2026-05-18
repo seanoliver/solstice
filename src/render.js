@@ -101,13 +101,12 @@ export function render(model, root, now) {
   const leg = document.createElement("section");
   leg.className = "panel legend";
   leg.innerHTML =
-    `<div class="kicker">Key</div><div class="keys">` +
+    `<div class="keys">` +
+    `<span><i style="background:${PALETTE.morning}"></i>Morning</span>` +
+    `<span><i style="background:${PALETTE.work}"></i>Work</span>` +
+    `<span><i style="background:${PALETTE.evening}"></i>Evening</span>` +
     `<span><i style="background:${PALETTE.night}"></i>Night</span>` +
-    `<span><i style="background:${PALETTE.dawn}"></i>Dawn · sunrise–9am</span>` +
-    `<span><i style="background:${PALETTE.work}"></i>Work · 9am–5pm</span>` +
-    `<span><i style="background:${PALETTE.evening}"></i>Evening · 5pm–sunset</span>` +
     `<span><i class="kd" style="background:#22d3ee"></i>day</span>` +
-    `<span><i class="kd" style="background:#e0a23d"></i>golden</span>` +
     `<span><i class="kd" style="background:#5b6675"></i>night</span>` +
     `</div>`;
   root.appendChild(leg);

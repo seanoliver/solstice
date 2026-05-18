@@ -13,7 +13,7 @@ test("buildModel row has the full shape", () => {
   const row = buildModel(zones, new Date("2026-05-18T19:00:00Z"))[0];
   assert.equal(row.label, "SF");
   assert.equal(typeof row.minutesOfDay, "number");
-  assert.ok(["night","dawn","work","evening"].includes(row.part));
+  assert.ok(["night","morning","work","evening"].includes(row.part));
   assert.ok(Array.isArray(row.segments) && row.segments.length >= 1);
   assert.ok(row.dayProgress >= 0 && row.dayProgress <= 1);
   assert.match(row.dateLabel, /\w{3},\s\w{3}\s\d/); // e.g. "Mon, May 18"

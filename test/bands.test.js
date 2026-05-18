@@ -12,12 +12,12 @@ test("segments cover the full day contiguously", () => {
     assert.ok(Math.abs((segs[i-1].startPct + segs[i-1].widthPct) - segs[i].startPct) < 1e-6);
 });
 
-test("summer day has night,dawn,work,evening,night", () => {
+test("summer day has night,morning,work,evening,night", () => {
   const parts = daySegments(348, 1233).map(s => s.part);
-  assert.deepEqual(parts, ["night","dawn","work","evening","night"]);
+  assert.deepEqual(parts, ["night","morning","work","evening","night"]);
 });
 
 test("winter (sunset<17:00) has no evening", () => {
   const parts = daySegments(484, 953).map(s => s.part);
-  assert.deepEqual(parts, ["night","dawn","work","night"]);
+  assert.deepEqual(parts, ["night","morning","work","night"]);
 });

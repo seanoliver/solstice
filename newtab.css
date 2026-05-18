@@ -28,9 +28,9 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .big .rt { height:7rem; display:flex; flex-direction:column;
   align-items:flex-start; justify-content:space-between;
   margin:0 0 0 .6rem; }
-.big .ap { font-size:1.4rem; color:var(--muted); }
+.big .ap { font-size:1.4rem; color:var(--muted); letter-spacing:.06em; }
 .big .secs { font:.95rem/1 ui-monospace,Menlo,monospace;
-  color:var(--accent); }
+  color:var(--accent); letter-spacing:.06em; }
 .cards { display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:1rem; margin-bottom:1.2rem; }

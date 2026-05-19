@@ -95,7 +95,12 @@ node --test
 - `config.js` — the first-run default `ZONES` list (`{ label, tz, lat, lon }`).
 - `cities.js` — bundled searchable city dataset (`{ name, tz, lat, lon }`).
 - `assets/fonts/` — bundled JetBrains Mono variable woff2 (offline, OFL).
-- `src/` — `timeModel.js` (zone-row builder), `sun.js` (offline NOAA
+- The card grid is responsive to **both** width and card count: ≤5 → one
+  row; 6+ → balanced rows (3×2, 4+3, …), capped at 5 wide, never a lone
+  orphan card. Reflows on resize.
+
+- `src/` — `timeModel.js` (zone-row builder), `layout.js` (card-grid
+  column count), `sun.js` (offline NOAA
   sunrise/sunset), `bands.js` (day-part band segments), `dayPart.js`
   (day-part bucketing + shared palette), `zones.js` (localStorage zone
   store: seed/add/remove, local pinned), `geo.js` (cached IP city lookup

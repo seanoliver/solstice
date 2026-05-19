@@ -4,6 +4,11 @@
   "version": "1.0.0",
   "description": "A readable simultaneous view of my timezones.",
   "permissions": ["geolocation"],
-  "host_permissions": ["https://api.bigdatacloud.net/*"],
+  "host_permissions": [
+    "https://api.bigdatacloud.net/*",
+    "https://ipwho.is/*",
+    "https://ipapi.co/*",
+    "https://get.geojs.io/*"
+  ],
   "chrome_url_overrides": { "newtab": "newtab.html" }
 }

@@ -38,6 +38,10 @@ when detection resolves. Attempts log under `[geo]` in the console.
 The page always renders the timezone city immediately and silently upgrades
 to the IP city when it resolves — no blocking, no failure surfaced.
 
+A **12h / 24h** toggle in the top-right switches every time on the page
+(hero clock, cards, and the 24-hour timeline) at once. Default is 12-hour
+(AM/PM); the choice persists in `localStorage`.
+
 ## Install
 
 1. Open `chrome://extensions`.

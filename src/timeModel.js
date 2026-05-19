@@ -51,6 +51,18 @@ export function ymdNumber(date, tz) {
   return Math.floor(Date.UTC(g("year"), g("month") - 1, g("day")) / 86400000);
 }
 
+// Format an hour/minute into display parts for "12" or "24" hour mode.
+// 12: { hm:"3:02", ap:"PM" }   24: { hm:"15:02", ap:"" }
+export function formatHM(hour, minute, mode = "12") {
+  const mm = String(minute).padStart(2, "0");
+  if (mode === "24") {
+    return { hm: `${String(hour).padStart(2, "0")}:${mm}`, ap: "" };
+  }
+  const ap = hour < 12 ? "AM" : "PM";
+  const h12 = hour % 12 === 0 ? 12 : hour % 12;
+  return { hm: `${h12}:${mm}`, ap };
+}
+
 // "America/Los_Angeles" → "Los Angeles"; multi-segment uses the last part.
 export function cityFromTz(tz) {
   const seg = String(tz).split("/").pop() || String(tz);

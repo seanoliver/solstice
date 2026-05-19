@@ -1,8 +1,8 @@
 import { PALETTE } from "./dayPart.js";
+import { formatHM } from "./timeModel.js";
 
-function splitTime(label2) {
-  const parts = String(label2).trim().split(/\s+/); // handles NNBSP from Intl
-  return { hm: parts[0] || "", ap: parts[1] || "" };
+function timeMode(ctx) {
+  return ctx && ctx.timeMode === "24" ? "24" : "12";
 }
 
 function stripEl(row, tall) {
@@ -93,8 +93,9 @@ export function renderEditBar(barEl, ctx) {
 }
 
 export function renderLive(model, liveEl, now, ctx) {
+  const mode = timeMode(ctx);
   const local = model.find((r) => r.tz === "local") || model[0];
-  const t = splitTime(local.label2);
+  const t = formatHM(local.hour, local.minute, mode);
   const ss = String(now.getSeconds()).padStart(2, "0");
   const dateStr = new Intl.DateTimeFormat("en-US", {
     weekday: "long", month: "long", day: "numeric", year: "numeric",
@@ -105,9 +106,28 @@ export function renderLive(model, liveEl, now, ctx) {
 
   const top = document.createElement("header");
   top.className = "topbar";
-  top.innerHTML =
-    `<span class="brand"><i></i>WORLD TIME</span>` +
-    `<span class="today">${dateStr}</span>`;
+  const brand = document.createElement("span");
+  brand.className = "brand";
+  brand.innerHTML = `<i></i>WORLD TIME`;
+  const right = document.createElement("div");
+  right.className = "topright";
+  const today = document.createElement("span");
+  today.className = "today";
+  today.textContent = dateStr;
+  const fmt = document.createElement("div");
+  fmt.className = "fmt";
+  fmt.setAttribute("role", "group");
+  fmt.setAttribute("aria-label", "Time format");
+  for (const m of ["12", "24"]) {
+    const b = document.createElement("button");
+    b.className = "fmt-opt" + (mode === m ? " on" : "");
+    b.textContent = m + "h";
+    b.setAttribute("aria-pressed", String(mode === m));
+    b.addEventListener("click", () => ctx && ctx.onTimeMode(m));
+    fmt.appendChild(b);
+  }
+  right.append(today, fmt);
+  top.append(brand, right);
   liveEl.appendChild(top);
 
   const clock = document.createElement("section");
@@ -122,7 +142,7 @@ export function renderLive(model, liveEl, now, ctx) {
   const cards = document.createElement("section");
   cards.className = "cards";
   for (const r of model) {
-    const ct = splitTime(r.label2);
+    const ct = formatHM(r.hour, r.minute, mode);
     const c = document.createElement("article");
     c.className = "card" + (r.tz === "local" ? " card-local" : "");
     const head = document.createElement("div");
@@ -169,9 +189,8 @@ export function renderLive(model, liveEl, now, ctx) {
     end.className = "tlend";
     const time = document.createElement("span");
     time.className = "tltime";
-    time.textContent =
-      String(r.hour).padStart(2, "0") + ":" +
-      String(r.minute).padStart(2, "0");
+    const rt = formatHM(r.hour, r.minute, mode);
+    time.textContent = rt.ap ? `${rt.hm} ${rt.ap}` : rt.hm;
     const chip = document.createElement("span");
     chip.className = "tlday"; // always present → reserves constant width
     if (r.dayOffset !== 0) {

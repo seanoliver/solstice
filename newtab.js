@@ -19,11 +19,19 @@ let query = "";
 let focusSearch = false;
 // Cascade: manual home > geolocation > IP > (null → buildModel uses tz city)
 let localLabel = resolveLocalLabel(store, null);
+let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 
 function ctx() {
   return {
     editMode, query, cities: CITIES, focusSearch,
     home: readHome(store) || "",
+    timeMode: timeFmt,
+    onTimeMode(m) {
+      if (m !== "12" && m !== "24") return;
+      timeFmt = m;
+      store.setItem("timeFmt", m);
+      tick();
+    },
     onToggle() {
       editMode = !editMode; query = ""; focusSearch = false;
       paintBar(); tick();

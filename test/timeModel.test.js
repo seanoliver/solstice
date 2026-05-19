@@ -1,6 +1,19 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { zoneNow, buildModel, ymdNumber, cityFromTz } from "../src/timeModel.js";
+import { zoneNow, buildModel, ymdNumber, cityFromTz, formatHM } from "../src/timeModel.js";
+
+test("formatHM 12-hour", () => {
+  assert.deepEqual(formatHM(0, 5, "12"), { hm: "12:05", ap: "AM" });
+  assert.deepEqual(formatHM(12, 0, "12"), { hm: "12:00", ap: "PM" });
+  assert.deepEqual(formatHM(13, 2, "12"), { hm: "1:02", ap: "PM" });
+  assert.deepEqual(formatHM(9, 30, "12"), { hm: "9:30", ap: "AM" });
+});
+
+test("formatHM 24-hour", () => {
+  assert.deepEqual(formatHM(0, 5, "24"), { hm: "00:05", ap: "" });
+  assert.deepEqual(formatHM(13, 2, "24"), { hm: "13:02", ap: "" });
+  assert.deepEqual(formatHM(9, 30, "24"), { hm: "09:30", ap: "" });
+});
 
 test("buildModel uses the localLabel override for the local zone", () => {
   const zones = [{ label: "You", tz: "local", lat: 37.77, lon: -122.42 }];

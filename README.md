@@ -18,10 +18,11 @@ latitude/longitude in `config.js`. Each day is banded into four parts:
 - **Evening** — 5pm → sunset
 - **Night**
 
-The local card is labeled by city: it tries IP geolocation once
-(`ipapi.co`, result cached in `localStorage` for a day, refreshed when
-stale), and falls back to the machine timezone's city (e.g.
-`America/Los_Angeles` → "Los Angeles") if the network/API is unavailable.
+The local card is labeled by city: it tries IP geolocation once (several
+providers — ipwho.is, ipapi.co, geojs.io — in order; result cached in
+`localStorage` for a day, refreshed when stale), and falls back to the
+machine timezone's city (e.g. `America/Los_Angeles` → "Los Angeles") if the
+network/APIs are unavailable. Attempts log under `[geo]` in the console.
 The page always renders the timezone city immediately and silently upgrades
 to the IP city when it resolves — no blocking, no failure surfaced.
 

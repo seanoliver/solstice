@@ -44,3 +44,13 @@ test("fetchCity returns null when the request throws", async () => {
   const fake = async () => { throw new Error("network"); };
   assert.equal(await fetchCity(fake), null);
 });
+
+test("fetchCity falls through to a later provider on failure", async () => {
+  let n = 0;
+  const fake = async () => {
+    n += 1;
+    if (n === 1) throw new Error("first provider down");
+    return { ok: true, json: async () => ({ city: "San Francisco" }) };
+  };
+  assert.equal(await fetchCity(fake), "San Francisco");
+});

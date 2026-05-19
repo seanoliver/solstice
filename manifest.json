@@ -3,6 +3,10 @@
   "name": "Timezones New Tab",
   "version": "1.0.0",
   "description": "A readable simultaneous view of my timezones.",
-  "host_permissions": ["https://ipapi.co/*"],
+  "host_permissions": [
+    "https://ipwho.is/*",
+    "https://ipapi.co/*",
+    "https://get.geojs.io/*"
+  ],
   "chrome_url_overrides": { "newtab": "newtab.html" }
 }

@@ -19,13 +19,22 @@ latitude/longitude in `config.js`. Each day is banded into four parts:
 - **Evening** — 5pm → sunset
 - **Night**
 
-The local card is labeled by city: it uses the browser Geolocation API
-(Wi-Fi/GPS-based, accurate to the actual city), reverse-geocoded to a name
-via BigDataCloud, cached in `localStorage` for a day and refreshed when
-stale. If geolocation is denied/unavailable or the lookup fails it falls
-back silently to the machine timezone's city (e.g. `America/Los_Angeles` →
-"Los Angeles"). The page renders the timezone city immediately and upgrades
-when geolocation resolves. Attempts log under `[geo]` in the console.
+The local card's city label resolves through a cascade (highest priority
+first):
+
+1. **Manual home** — a label you type in Edit mode. Honored verbatim
+   (even "New York, NY" while you're on Pacific time — it only changes the
+   label, not the clock's timezone). Persists, no TTL, and short-circuits
+   all detection/network. Clear it (empty the field) to return to auto.
+2. **Browser Geolocation** — Wi-Fi/GPS-accurate, reverse-geocoded via
+   BigDataCloud. Cached in `localStorage` 24h.
+3. **IP geolocation** — approximate (ipwho.is → ipapi.co → geojs.io),
+   used only if Geolocation is denied/unavailable. Cached 24h.
+4. **Timezone city** — offline default (e.g. `America/Los_Angeles` →
+   "Los Angeles").
+
+The page renders the best already-known label immediately and upgrades
+when detection resolves. Attempts log under `[geo]` in the console.
 The page always renders the timezone city immediately and silently upgrades
 to the IP city when it resolves — no blocking, no failure surfaced.
 

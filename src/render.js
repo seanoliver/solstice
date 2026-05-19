@@ -68,6 +68,23 @@ export function renderEditBar(barEl, ctx) {
   }
   barEl.appendChild(panel);
 
+  const hb = document.createElement("div");
+  hb.className = "homebox";
+  const hi = document.createElement("input");
+  hi.type = "text";
+  hi.placeholder = "Home label — overrides detection (e.g. New York, NY)";
+  hi.value = ctx.home;
+  const commitHome = (e) => {
+    const v = e.target.value;
+    if (v.trim() !== (ctx.home || "").trim()) ctx.onHome(v);
+  };
+  hi.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); commitHome(e); }
+  });
+  hi.addEventListener("blur", commitHome);
+  hb.appendChild(hi);
+  barEl.appendChild(hb);
+
   if (ctx.focusSearch) {
     input.focus();
     const n = input.value.length;

@@ -1,7 +1,10 @@
 import { buildModel } from "./src/timeModel.js";
 import { renderLive, renderEditBar } from "./src/render.js";
 import { loadZones, saveZones, addZone, removeZone } from "./src/zones.js";
-import { readCachedCity, writeCachedCity, resolveCity } from "./src/geo.js";
+import {
+  resolveLocalLabel, needsRefresh, refreshLocation,
+  readHome, writeHome,
+} from "./src/geo.js";
 import { CITIES } from "./cities.js";
 
 const app = document.getElementById("app");
@@ -14,11 +17,13 @@ let zones = loadZones(store);
 let editMode = false;
 let query = "";
 let focusSearch = false;
-let geoCity = readCachedCity(store); // null if absent/stale → triggers refresh
+// Cascade: manual home > geolocation > IP > (null → buildModel uses tz city)
+let localLabel = resolveLocalLabel(store, null);
 
 function ctx() {
   return {
     editMode, query, cities: CITIES, focusSearch,
+    home: readHome(store) || "",
     onToggle() {
       editMode = !editMode; query = ""; focusSearch = false;
       paintBar(); tick();
@@ -37,6 +42,12 @@ function ctx() {
       saveZones(zones, store);
       tick();
     },
+    onHome(value) {
+      writeHome(store, value);
+      localLabel = resolveLocalLabel(store, null);
+      paintBar(); tick();
+      if (needsRefresh(store)) refreshGeo(); // cleared home → re-detect
+    },
   };
 }
 
@@ -44,16 +55,15 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 
 function tick() {
   const now = new Date();
-  renderLive(buildModel(zones, now, geoCity), live, now, ctx());
+  renderLive(buildModel(zones, now, localLabel), live, now, ctx());
 }
 
-// Render immediately with the timezone city; upgrade to the IP city when
-// the cache is missing/stale and the network resolves. Failure is silent.
+// Render immediately with whatever the cascade already knows; upgrade when
+// detection resolves. Manual home short-circuits all of this (no network).
 async function refreshGeo() {
-  const city = await resolveCity();
-  if (city && city !== geoCity) {
-    geoCity = city;
-    writeCachedCity(store, city);
+  const city = await refreshLocation(store);
+  if (city) {
+    localLabel = resolveLocalLabel(store, null);
     tick();
   }
 }
@@ -61,4 +71,4 @@ async function refreshGeo() {
 paintBar();
 tick();
 setInterval(tick, 1000);
-if (!geoCity) refreshGeo();
+if (needsRefresh(store)) refreshGeo();

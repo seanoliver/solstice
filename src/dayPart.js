@@ -1,5 +1,5 @@
 export const PALETTE = {
-  night:   "#161b22",
+  night:   "#283142",
   morning: "#c2873f",
   work:    "#2bb3a3",
   evening: "#cf7a3a",

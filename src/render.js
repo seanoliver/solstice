@@ -183,7 +183,7 @@ export function renderLive(model, liveEl, now, ctx) {
   // Count- AND width-aware columns: ≤5 one row, 6+ balanced (no orphan).
   const avail = cards.clientWidth || liveEl.clientWidth || 1129;
   const cols = gridColumns(model.length, avail);
-  cards.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+  cards.style.setProperty("--cols", cols);
 
   const tl = document.createElement("section");
   tl.className = "panel timeline";

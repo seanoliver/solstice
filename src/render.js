@@ -20,7 +20,9 @@ function stripEl(row, tall) {
   const m = document.createElement("i");
   m.className = "marker";
   m.style.left = row.dayProgress * 100 + "%";
-  m.style.background = PALETTE[row.part];
+  // Timeline marker takes the band color (ring carries contrast); the
+  // card marker is a solid white dot (CSS) for at-a-glance clarity.
+  if (tall) m.style.background = PALETTE[row.part];
   strip.appendChild(m);
   return strip;
 }

@@ -1,7 +1,7 @@
 import { buildModel } from "./src/timeModel.js";
 import { renderLive, renderEditBar } from "./src/render.js";
 import { loadZones, saveZones, addZone, removeZone } from "./src/zones.js";
-import { readCachedCity, writeCachedCity, fetchCity } from "./src/geo.js";
+import { readCachedCity, writeCachedCity, resolveCity } from "./src/geo.js";
 import { CITIES } from "./cities.js";
 
 const app = document.getElementById("app");
@@ -50,7 +50,7 @@ function tick() {
 // Render immediately with the timezone city; upgrade to the IP city when
 // the cache is missing/stale and the network resolves. Failure is silent.
 async function refreshGeo() {
-  const city = await fetchCity();
+  const city = await resolveCity();
   if (city && city !== geoCity) {
     geoCity = city;
     writeCachedCity(store, city);

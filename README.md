@@ -1,9 +1,10 @@
 # World Time New Tab
 
 A near-zero-permission Chrome MV3 extension that replaces the new-tab page
-with a single, muted, modern world-clock. The only permission is one
-`host_permissions` entry for optional IP-based local-city detection
-(`https://ipapi.co/*`); everything else is offline. One page shows:
+with a single, muted, modern world-clock. Permissions are limited to
+`geolocation` plus one `host_permissions` entry
+(`https://api.bigdatacloud.net/*`) for optional precise local-city
+detection; everything else is offline. One page shows:
 
 - a big local clock,
 - per-zone cards with day-part-banded progress bars,
@@ -18,11 +19,13 @@ latitude/longitude in `config.js`. Each day is banded into four parts:
 - **Evening** — 5pm → sunset
 - **Night**
 
-The local card is labeled by city: it tries IP geolocation once (several
-providers — ipwho.is, ipapi.co, geojs.io — in order; result cached in
-`localStorage` for a day, refreshed when stale), and falls back to the
-machine timezone's city (e.g. `America/Los_Angeles` → "Los Angeles") if the
-network/APIs are unavailable. Attempts log under `[geo]` in the console.
+The local card is labeled by city: it uses the browser Geolocation API
+(Wi-Fi/GPS-based, accurate to the actual city), reverse-geocoded to a name
+via BigDataCloud, cached in `localStorage` for a day and refreshed when
+stale. If geolocation is denied/unavailable or the lookup fails it falls
+back silently to the machine timezone's city (e.g. `America/Los_Angeles` →
+"Los Angeles"). The page renders the timezone city immediately and upgrades
+when geolocation resolves. Attempts log under `[geo]` in the console.
 The page always renders the timezone city immediately and silently upgrades
 to the IP city when it resolves — no blocking, no failure surfaced.
 

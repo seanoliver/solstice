@@ -80,3 +80,9 @@ paintBar();
 tick();
 setInterval(tick, 1000);
 if (needsRefresh(store)) refreshGeo();
+
+let resizeRaf;
+window.addEventListener("resize", () => {
+  cancelAnimationFrame(resizeRaf);
+  resizeRaf = requestAnimationFrame(tick);
+});

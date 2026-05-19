@@ -1,5 +1,6 @@
 import { PALETTE } from "./dayPart.js";
 import { formatHM } from "./timeModel.js";
+import { gridColumns } from "./layout.js";
 
 function timeMode(ctx) {
   return ctx && ctx.timeMode === "24" ? "24" : "12";
@@ -172,6 +173,10 @@ export function renderLive(model, liveEl, now, ctx) {
     cards.appendChild(c);
   }
   liveEl.appendChild(cards);
+  // Count- AND width-aware columns: ≤5 one row, 6+ balanced (no orphan).
+  const avail = cards.clientWidth || liveEl.clientWidth || 1129;
+  const cols = gridColumns(model.length, avail);
+  cards.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
 
   const tl = document.createElement("section");
   tl.className = "panel timeline";

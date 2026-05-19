@@ -45,6 +45,8 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .big .ap { font-size:1.4rem; color:var(--muted); letter-spacing:.06em; }
 .big .secs { font:.95rem/1 "JetBrains Mono",ui-monospace,Menlo,monospace;
   color:var(--accent); letter-spacing:.06em; }
+/* grid-template-columns is set per-render by gridColumns() (count- and
+   width-aware); fallback below applies only before the first paint. */
 .cards { display:grid;
   grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
   gap:1rem; margin-bottom:2.4rem; }

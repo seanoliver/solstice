@@ -17,21 +17,17 @@ function stripEl(row, tall) {
     seg.style.background = PALETTE[s.part];
     strip.appendChild(seg);
   }
-  if (!tall) {
-    // Dim the part of the day that hasn't happened yet (card strips only).
-    const future = document.createElement("span");
-    future.className = "future";
-    future.style.left = row.dayProgress * 100 + "%";
-    future.style.right = "0";
-    strip.appendChild(future);
-  }
+  // Dim the part of the day that hasn't happened yet.
+  const future = document.createElement("span");
+  future.className = "future";
+  future.style.left = row.dayProgress * 100 + "%";
+  future.style.right = "0";
+  strip.appendChild(future);
 
+  // Solid white marker (CSS) on both cards and the timeline.
   const m = document.createElement("i");
   m.className = "marker";
   m.style.left = row.dayProgress * 100 + "%";
-  // Timeline marker takes the band color (ring carries contrast); the
-  // card marker is a solid white dot (CSS) for at-a-glance clarity.
-  if (tall) m.style.background = PALETTE[row.part];
   strip.appendChild(m);
   return strip;
 }

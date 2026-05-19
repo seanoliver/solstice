@@ -149,6 +149,18 @@ export function renderLive(model, liveEl, now, ctx) {
 
   const cards = document.createElement("section");
   cards.className = "cards";
+  liveEl.appendChild(cards);
+  // Count- AND width-aware columns: ≤5 one row, 6+ balanced (no orphan).
+  const avail = cards.clientWidth || liveEl.clientWidth || 1129;
+  const cols = gridColumns(model.length, avail);
+  cards.style.setProperty("--cols", cols);
+  // Uneven rows → put the shorter (remainder) row on top, full rows below.
+  const N = model.length;
+  const rows = Math.ceil(N / cols);
+  const topCount = rows > 1 ? N - (rows - 1) * cols : N;
+  const needBreak = rows > 1 && N % cols !== 0;
+
+  let idx = 0;
   for (const r of model) {
     const ct = formatHM(r.hour, r.minute, mode);
     const c = document.createElement("article");
@@ -178,12 +190,13 @@ export function renderLive(model, liveEl, now, ctx) {
       c.classList.add("editing");
     }
     cards.appendChild(c);
+    idx += 1;
+    if (needBreak && idx === topCount) {
+      const br = document.createElement("span");
+      br.className = "rowbreak";
+      cards.appendChild(br);
+    }
   }
-  liveEl.appendChild(cards);
-  // Count- AND width-aware columns: ≤5 one row, 6+ balanced (no orphan).
-  const avail = cards.clientWidth || liveEl.clientWidth || 1129;
-  const cols = gridColumns(model.length, avail);
-  cards.style.setProperty("--cols", cols);
 
   const tl = document.createElement("section");
   tl.className = "panel timeline";

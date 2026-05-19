@@ -69,9 +69,11 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .strip { position:relative; height:6px; border-radius:3px; overflow:hidden;
   background:#11161e; margin-top:.45rem; }
 .strip .seg { position:absolute; top:0; bottom:0; }
-.strip .marker { position:absolute; top:50%; width:9px; height:9px;
+/* Marker fill matches the band beneath it, so a dark + bright ring
+   carries visibility (card strips too, not just the timeline). */
+.strip .marker { position:absolute; top:50%; width:8px; height:8px;
   border-radius:50%; transform:translate(-50%,-50%);
-  box-shadow:0 0 0 2px var(--bg); }
+  box-shadow:0 0 0 1px rgba(0,0,0,.55), 0 0 0 2.5px rgba(255,255,255,.9); }
 .strip-tall { height:14px; border-radius:5px; }
 /* Timeline marker fill matches the band underneath, so the ring carries
    visibility: a thin dark separator + a bright outer ring. */

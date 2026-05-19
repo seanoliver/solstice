@@ -69,6 +69,8 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .strip { position:relative; height:6px; border-radius:3px; overflow:hidden;
   background:#11161e; margin-top:.45rem; }
 .strip .seg { position:absolute; top:0; bottom:0; }
+.strip .future { position:absolute; top:0; bottom:0;
+  background:var(--bg); opacity:.55; pointer-events:none; }
 /* Card marker: solid white dot with a thin dark separator so it reads on
    any band. (The timeline marker overrides this below.) */
 .strip .marker { position:absolute; top:50%; width:8px; height:8px;

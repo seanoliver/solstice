@@ -17,6 +17,15 @@ function stripEl(row, tall) {
     seg.style.background = PALETTE[s.part];
     strip.appendChild(seg);
   }
+  if (!tall) {
+    // Dim the part of the day that hasn't happened yet (card strips only).
+    const future = document.createElement("span");
+    future.className = "future";
+    future.style.left = row.dayProgress * 100 + "%";
+    future.style.right = "0";
+    strip.appendChild(future);
+  }
+
   const m = document.createElement("i");
   m.className = "marker";
   m.style.left = row.dayProgress * 100 + "%";

@@ -67,6 +67,7 @@ function buildEditPanel(ctx) {
   ctx.zones.forEach((z, idx) => {
     list.appendChild(buildZoneRow(z, idx, ctx));
   });
+  attachDrag(list, ctx);
   panel.appendChild(list);
 
   panel.appendChild(buildSearch(ctx));
@@ -190,6 +191,61 @@ function buildSearch(ctx) {
     });
   }
   return wrap;
+}
+
+function attachDrag(listEl, ctx) {
+  let state = null;
+
+  listEl.addEventListener("pointerdown", (e) => {
+    const handle = e.target.closest(".drag-handle");
+    if (!handle) return;
+    const row = handle.closest(".zone-row");
+    if (!row || row.classList.contains("zone-local")) return;
+    const fromIdx = Number(row.dataset.idx);
+    if (!Number.isInteger(fromIdx) || fromIdx <= 0) return;
+
+    e.preventDefault();
+    handle.setPointerCapture(e.pointerId);
+
+    const rows = Array.from(listEl.querySelectorAll(".zone-row"));
+    const rect = row.getBoundingClientRect();
+    const rowH = rect.height;
+    state = {
+      pointerId: e.pointerId, handle, row, rows, fromIdx,
+      startY: e.clientY, rowH, currentTarget: fromIdx,
+    };
+    row.classList.add("dragging");
+  });
+
+  listEl.addEventListener("pointermove", (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    const dy = e.clientY - state.startY;
+    state.row.style.transform = `translateY(${dy}px)`;
+    let target = state.fromIdx + Math.round(dy / state.rowH);
+    if (target < 1) target = 1;
+    if (target >= state.rows.length) target = state.rows.length - 1;
+    if (target !== state.currentTarget) {
+      state.currentTarget = target;
+      state.rows.forEach((r, i) => {
+        if (i === state.fromIdx) return;
+        let shift = 0;
+        if (state.fromIdx < target && i > state.fromIdx && i <= target) shift = -state.rowH;
+        else if (state.fromIdx > target && i < state.fromIdx && i >= target) shift = state.rowH;
+        r.style.transform = shift ? `translateY(${shift}px)` : "";
+      });
+    }
+  });
+
+  const finish = (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    const { fromIdx, currentTarget } = state;
+    state.rows.forEach((r) => { r.style.transform = ""; });
+    state.row.classList.remove("dragging");
+    state = null;
+    if (currentTarget !== fromIdx) ctx.onReorder(fromIdx, currentTarget);
+  };
+  listEl.addEventListener("pointerup", finish);
+  listEl.addEventListener("pointercancel", finish);
 }
 
 export function renderLive(model, liveEl, now, ctx) {

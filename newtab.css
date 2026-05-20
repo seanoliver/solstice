@@ -181,3 +181,6 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 @media (max-width: 600px) {
   .editpanel { width:100vw; border-left:0; }
 }
+.zone-row { transition:transform 120ms ease; }
+.zone-row.dragging { transition:none; opacity:.92;
+  background:#1b2230; z-index:2; position:relative; }

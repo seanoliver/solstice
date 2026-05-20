@@ -32,6 +32,8 @@ function stripEl(row, tall) {
   return strip;
 }
 
+let panelMounted = false;
+
 export function renderEditBar(barEl, ctx) {
   barEl.innerHTML = "";
   barEl.className = "editbar";
@@ -42,8 +44,13 @@ export function renderEditBar(barEl, ctx) {
   toggle.addEventListener("click", () => ctx.onToggle());
   barEl.appendChild(toggle);
 
-  if (!ctx.editMode) return;
-  barEl.appendChild(buildEditPanel(ctx));
+  if (!ctx.editMode) { panelMounted = false; return; }
+  const panel = buildEditPanel(ctx);
+  if (!panelMounted) {
+    panel.classList.add("entering");
+    panelMounted = true;
+  }
+  barEl.appendChild(panel);
 }
 
 function buildEditPanel(ctx) {

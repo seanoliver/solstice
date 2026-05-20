@@ -26,6 +26,8 @@ let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 function ctx() {
   return {
     editMode, query, cities: CITIES, focusSearch, zones,
+    localLabel,
+    home: readHome(store) || "",
     timeMode: timeFmt,
     onTimeMode(m) {
       if (m !== "12" && m !== "24") return;

@@ -93,9 +93,14 @@ function buildZoneRow(z, idx, ctx) {
 
   const label = document.createElement("span");
   label.className = "zone-label";
-  label.textContent = z.label || (z.tz === "local" ? "(detect)" : "");
+  label.textContent = z.tz === "local"
+    ? (ctx.localLabel || "(detect)")
+    : z.label;
   label.title = "Click to rename";
-  label.addEventListener("click", () => startEdit(label, z, ctx));
+  label.addEventListener("click", () => {
+    const prefill = z.tz === "local" ? (ctx.home || "") : (z.label || "");
+    startEdit(label, z, ctx, prefill);
+  });
   row.appendChild(label);
 
   const abbr = document.createElement("span");
@@ -128,10 +133,10 @@ function tzAbbr(tz) {
   } catch { return ""; }
 }
 
-function startEdit(labelEl, row, ctx) {
+function startEdit(labelEl, row, ctx, prefill) {
   const input = document.createElement("input");
   input.className = "zone-label-input";
-  input.value = row.label || "";
+  input.value = prefill;
   let committed = false;
   const commit = () => {
     if (committed) return;

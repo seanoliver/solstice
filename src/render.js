@@ -336,63 +336,76 @@ export function renderLive(model, liveEl, now, ctx) {
   top.append(brand, right);
   liveEl.appendChild(top);
 
+  const soloZone = model.length === 1;
+
   const clock = document.createElement("section");
-  clock.className = "clock";
-  clock.innerHTML =
-    `<div class="kicker">LOCAL TIME</div>` +
+  clock.className = "clock" + (soloZone ? " clock-solo" : "");
+  const bigHtml =
     `<div class="big">${t.hm.replace(":", '<i class="cl">:</i>')}` +
     `<span class="rt"><span class="secs">:${ss}</span>` +
     `<sub class="ap">${t.ap}</sub></span></div>`;
+  if (soloZone) {
+    clock.innerHTML = bigHtml;
+    const meta = document.createElement("div");
+    meta.className = "solo-meta";
+    meta.textContent = `${local.label} · ${local.tzAbbrev}`;
+    const date = document.createElement("div");
+    date.className = "solo-date";
+    date.textContent = local.dateLabel;
+    clock.append(meta, date, stripEl(local, true));
+  } else {
+    clock.innerHTML = `<div class="kicker">LOCAL TIME</div>` + bigHtml;
+  }
   liveEl.appendChild(clock);
 
-  const cards = document.createElement("section");
-  cards.className = "cards";
-  liveEl.appendChild(cards);
-  // Count- AND width-aware columns: ≤5 one row, 6+ balanced (no orphan).
-  const avail = cards.clientWidth || liveEl.clientWidth || 1129;
-  const cols = gridColumns(model.length, avail);
-  cards.style.setProperty("--cols", cols);
-  // Uneven rows → put the shorter (remainder) row on top, full rows below.
-  const N = model.length;
-  const rows = Math.ceil(N / cols);
-  const topCount = rows > 1 ? N - (rows - 1) * cols : N;
-  const needBreak = rows > 1 && N % cols !== 0;
+  if (!soloZone) {
+    const cards = document.createElement("section");
+    cards.className = "cards";
+    liveEl.appendChild(cards);
+    const avail = cards.clientWidth || liveEl.clientWidth || 1129;
+    const cols = gridColumns(model.length, avail);
+    cards.style.setProperty("--cols", cols);
+    const N = model.length;
+    const rows = Math.ceil(N / cols);
+    const topCount = rows > 1 ? N - (rows - 1) * cols : N;
+    const needBreak = rows > 1 && N % cols !== 0;
 
-  let idx = 0;
-  for (const r of model) {
-    const ct = formatHM(r.hour, r.minute, mode);
-    const c = document.createElement("article");
-    c.className = "card" + (r.tz === "local" ? " card-local" : "");
-    const head = document.createElement("div");
-    head.className = "card-head";
-    head.innerHTML =
-      `<span class="abbr">${r.tzAbbrev}</span>` +
-      `<i class="dot" style="background:${PALETTE[r.part]}"></i>`;
-    const city = document.createElement("div");
-    city.className = "city";
-    city.textContent = r.label;
-    const time = document.createElement("div");
-    time.className = "card-time";
-    time.innerHTML = `${ct.hm}<sub>${ct.ap}</sub>`;
-    const date = document.createElement("div");
-    date.className = "card-date";
-    date.textContent = r.dateLabel;
-    c.append(head, city, time, date, stripEl(r, false));
-    if (ctx && ctx.editMode && r.tz !== "local") {
-      const x = document.createElement("button");
-      x.className = "card-x";
-      x.textContent = "×";
-      x.title = "Remove";
-      x.addEventListener("click", () => ctx.onRemove(r));
-      c.appendChild(x);
-      c.classList.add("editing");
-    }
-    cards.appendChild(c);
-    idx += 1;
-    if (needBreak && idx === topCount) {
-      const br = document.createElement("span");
-      br.className = "rowbreak";
-      cards.appendChild(br);
+    let idx = 0;
+    for (const r of model) {
+      const ct = formatHM(r.hour, r.minute, mode);
+      const c = document.createElement("article");
+      c.className = "card" + (r.tz === "local" ? " card-local" : "");
+      const head = document.createElement("div");
+      head.className = "card-head";
+      head.innerHTML =
+        `<span class="abbr">${r.tzAbbrev}</span>` +
+        `<i class="dot" style="background:${PALETTE[r.part]}"></i>`;
+      const city = document.createElement("div");
+      city.className = "city";
+      city.textContent = r.label;
+      const time = document.createElement("div");
+      time.className = "card-time";
+      time.innerHTML = `${ct.hm}<sub>${ct.ap}</sub>`;
+      const date = document.createElement("div");
+      date.className = "card-date";
+      date.textContent = r.dateLabel;
+      c.append(head, city, time, date, stripEl(r, false));
+      if (ctx && ctx.editMode && r.tz !== "local") {
+        const x = document.createElement("button");
+        x.className = "card-x";
+        x.textContent = "×";
+        x.title = "Remove";
+        x.addEventListener("click", () => ctx.onRemove(r));
+        c.appendChild(x);
+        c.classList.add("editing");
+      }
+      cards.appendChild(c);
+      idx += 1;
+      if (needBreak && idx === topCount) {
+        const br = document.createElement("span");
+        br.className = "rowbreak";
+        cards.appendChild(br);
+      }
     }
   }
 

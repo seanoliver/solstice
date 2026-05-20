@@ -17,6 +17,13 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
    fixed legend; topbar stays pinned at the top. */
 .live .clock { margin-top:auto; }
 .live .timeline { margin-bottom:auto; }
+.live .clock.clock-solo { margin-top:auto; margin-bottom:auto; gap:1.1rem;
+  padding:2rem 0; }
+.clock-solo .solo-meta { font:500 1.05rem/1.2 "JetBrains Mono",ui-monospace,Menlo,monospace;
+  color:var(--txt); letter-spacing:.06em; }
+.clock-solo .solo-date { font:13px/1.2 "JetBrains Mono",ui-monospace,Menlo,monospace;
+  color:var(--muted); }
+.clock-solo .strip { width:min(70vw, 420px); margin-top:.4rem; }
 .kicker { font:500 12px/1 "JetBrains Mono",ui-monospace,Menlo,monospace; letter-spacing:.18em;
   color:var(--muted); text-transform:uppercase; }
 .topbar { display:flex; justify-content:space-between; align-items:center;

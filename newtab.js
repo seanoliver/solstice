@@ -51,7 +51,7 @@ function ctx() {
         (z) => z.tz === row.tz && z.label === row.label);
       zones = removeZone(zones, idx);
       saveZones(zones, store);
-      tick();
+      paintBar(); tick();
     },
     onHome(value) {
       writeHome(store, value);

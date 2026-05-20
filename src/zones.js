@@ -35,3 +35,9 @@ export function removeZone(list, idx) {
   if (!z || isLocal(z)) return list;
   return list.filter((_, i) => i !== idx);
 }
+
+export function renameZone(list, idx, newLabel) {
+  if (idx < 0 || idx >= list.length) return list;
+  const label = String(newLabel ?? "").trim();
+  return list.map((z, i) => (i === idx ? { ...z, label } : z));
+}

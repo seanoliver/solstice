@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadZones, saveZones, addZone, removeZone } from "../src/zones.js";
+import { loadZones, saveZones, addZone, removeZone, renameZone } from "../src/zones.js";
 
 function stub() {
   const mem = {};
@@ -44,4 +44,26 @@ test("removeZone removes by index but never the local zone", () => {
   ];
   assert.equal(removeZone(list, 1).length, 1);
   assert.equal(removeZone(list, 0).length, 2, "local protected");
+});
+
+test("renameZone updates label by index without mutating input", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 35.6, lon: 139.6 },
+  ];
+  const next = renameZone(list, 1, "Aiko");
+  assert.equal(next[1].label, "Aiko");
+  assert.equal(list[1].label, "Tokyo", "input untouched");
+  assert.notEqual(next, list, "returns new list");
+});
+
+test("renameZone trims whitespace", () => {
+  const list = [{ label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 }];
+  assert.equal(renameZone(list, 0, "  Aiko  ")[0].label, "Aiko");
+});
+
+test("renameZone is a no-op for out-of-range idx", () => {
+  const list = [{ label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 }];
+  assert.equal(renameZone(list, 5, "X"), list);
+  assert.equal(renameZone(list, -1, "X"), list);
 });

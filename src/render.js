@@ -92,8 +92,9 @@ function buildZoneRow(z, idx, ctx) {
 
   const label = document.createElement("span");
   label.className = "zone-label";
-  label.textContent = z.label;
+  label.textContent = z.label || (z.tz === "local" ? "(detect)" : "");
   label.title = "Click to rename";
+  label.addEventListener("click", () => startEdit(label, z, ctx));
   row.appendChild(label);
 
   const abbr = document.createElement("span");
@@ -124,6 +125,28 @@ function tzAbbr(tz) {
     }).formatToParts(new Date());
     return (parts.find((p) => p.type === "timeZoneName") || {}).value || "";
   } catch { return ""; }
+}
+
+function startEdit(labelEl, row, ctx) {
+  const input = document.createElement("input");
+  input.className = "zone-label-input";
+  input.value = row.label || "";
+  let committed = false;
+  const commit = () => {
+    if (committed) return;
+    committed = true;
+    ctx.onRename(row, input.value);
+  };
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === "Escape") {
+      e.preventDefault();
+      input.blur();
+    }
+  });
+  input.addEventListener("blur", commit);
+  labelEl.replaceWith(input);
+  input.focus();
+  input.select();
 }
 
 function buildSearch(ctx) {

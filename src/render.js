@@ -43,15 +43,98 @@ export function renderEditBar(barEl, ctx) {
   barEl.appendChild(toggle);
 
   if (!ctx.editMode) return;
+  barEl.appendChild(buildEditPanel(ctx));
+}
 
-  const panel = document.createElement("div");
-  panel.className = "addbox";
+function buildEditPanel(ctx) {
+  const panel = document.createElement("aside");
+  panel.className = "editpanel";
+
+  const header = document.createElement("div");
+  header.className = "ep-header";
+  const title = document.createElement("span");
+  title.textContent = "Edit zones";
+  const close = document.createElement("button");
+  close.className = "ep-close";
+  close.textContent = "×";
+  close.title = "Close";
+  close.addEventListener("click", () => ctx.onToggle());
+  header.append(title, close);
+  panel.appendChild(header);
+
+  const list = document.createElement("ul");
+  list.className = "ep-list";
+  ctx.zones.forEach((z, idx) => {
+    list.appendChild(buildZoneRow(z, idx, ctx));
+  });
+  panel.appendChild(list);
+
+  panel.appendChild(buildSearch(ctx));
+
+  const done = document.createElement("button");
+  done.className = "ep-done";
+  done.textContent = "Done";
+  done.addEventListener("click", () => ctx.onToggle());
+  panel.appendChild(done);
+
+  return panel;
+}
+
+function buildZoneRow(z, idx, ctx) {
+  const row = document.createElement("li");
+  row.className = "zone-row" + (z.tz === "local" ? " zone-local" : "");
+  row.dataset.idx = String(idx);
+
+  const handle = document.createElement("span");
+  handle.className = "drag-handle";
+  handle.textContent = z.tz === "local" ? "" : "≡";
+  row.appendChild(handle);
+
+  const label = document.createElement("span");
+  label.className = "zone-label";
+  label.textContent = z.label;
+  label.title = "Click to rename";
+  row.appendChild(label);
+
+  const abbr = document.createElement("span");
+  abbr.className = "zone-abbr";
+  abbr.textContent = tzAbbr(z.tz);
+  row.appendChild(abbr);
+
+  if (z.tz !== "local") {
+    const x = document.createElement("button");
+    x.className = "zone-x";
+    x.textContent = "×";
+    x.title = "Remove";
+    x.addEventListener("click", () => ctx.onRemove(z));
+    row.appendChild(x);
+  } else {
+    const spacer = document.createElement("span");
+    spacer.className = "zone-x zone-x-spacer";
+    row.appendChild(spacer);
+  }
+  return row;
+}
+
+function tzAbbr(tz) {
+  if (tz === "local") tz = undefined;
+  try {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz, timeZoneName: "short",
+    }).formatToParts(new Date());
+    return (parts.find((p) => p.type === "timeZoneName") || {}).value || "";
+  } catch { return ""; }
+}
+
+function buildSearch(ctx) {
+  const wrap = document.createElement("div");
+  wrap.className = "ep-search";
   const input = document.createElement("input");
   input.type = "text";
   input.placeholder = "Add a city…";
   input.value = ctx.query;
   input.addEventListener("input", (e) => ctx.onQuery(e.target.value));
-  panel.appendChild(input);
+  wrap.appendChild(input);
 
   const q = ctx.query.trim().toLowerCase();
   if (q) {
@@ -60,44 +143,30 @@ export function renderEditBar(barEl, ctx) {
       .slice(0, 8);
     const ul = document.createElement("ul");
     ul.className = "results";
-    for (const c of results) {
-      const li = document.createElement("li");
-      li.textContent = c.name + "  ·  " + c.tz;
-      li.addEventListener("click", () => ctx.onAdd(c));
-      ul.appendChild(li);
-    }
     if (!results.length) {
       const li = document.createElement("li");
       li.className = "empty";
       li.textContent = "No match";
       ul.appendChild(li);
+    } else {
+      for (const c of results) {
+        const li = document.createElement("li");
+        li.textContent = c.name + "  ·  " + c.tz;
+        li.addEventListener("click", () => ctx.onAdd(c));
+        ul.appendChild(li);
+      }
     }
-    panel.appendChild(ul);
+    wrap.appendChild(ul);
   }
-  barEl.appendChild(panel);
-
-  const hb = document.createElement("div");
-  hb.className = "homebox";
-  const hi = document.createElement("input");
-  hi.type = "text";
-  hi.placeholder = "Home label — overrides detection (e.g. New York, NY)";
-  hi.value = ctx.home;
-  const commitHome = (e) => {
-    const v = e.target.value;
-    if (v.trim() !== (ctx.home || "").trim()) ctx.onHome(v);
-  };
-  hi.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); commitHome(e); }
-  });
-  hi.addEventListener("blur", commitHome);
-  hb.appendChild(hi);
-  barEl.appendChild(hb);
 
   if (ctx.focusSearch) {
-    input.focus();
-    const n = input.value.length;
-    input.setSelectionRange(n, n);
+    queueMicrotask(() => {
+      input.focus();
+      const n = input.value.length;
+      input.setSelectionRange(n, n);
+    });
   }
+  return wrap;
 }
 
 export function renderLive(model, liveEl, now, ctx) {

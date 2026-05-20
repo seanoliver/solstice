@@ -161,11 +161,15 @@ function buildSearch(ctx) {
   wrap.appendChild(input);
 
   const q = ctx.query.trim().toLowerCase();
+  let results = [];
+  let activeIdx = -1;
+  let ul = null;
+
   if (q) {
-    const results = ctx.cities
+    results = ctx.cities
       .filter((c) => c.name.toLowerCase().includes(q))
       .slice(0, 8);
-    const ul = document.createElement("ul");
+    ul = document.createElement("ul");
     ul.className = "results";
     if (!results.length) {
       const li = document.createElement("li");
@@ -173,15 +177,44 @@ function buildSearch(ctx) {
       li.textContent = "No match";
       ul.appendChild(li);
     } else {
-      for (const c of results) {
+      results.forEach((c, i) => {
         const li = document.createElement("li");
         li.textContent = c.name + "  ·  " + c.tz;
+        li.dataset.idx = String(i);
+        li.addEventListener("mouseenter", () => setActive(i));
         li.addEventListener("click", () => ctx.onAdd(c));
         ul.appendChild(li);
-      }
+      });
     }
     wrap.appendChild(ul);
   }
+
+  function setActive(i) {
+    activeIdx = i;
+    if (!ul) return;
+    Array.from(ul.children).forEach((li, idx) => {
+      li.classList.toggle("active", idx === i);
+    });
+  }
+
+  input.addEventListener("keydown", (e) => {
+    if (!results.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActive(activeIdx < 0 ? 0 : Math.min(activeIdx + 1, results.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (activeIdx > 0) setActive(activeIdx - 1);
+      else setActive(-1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      const pick = activeIdx >= 0 ? results[activeIdx] : results[0];
+      if (pick) ctx.onAdd(pick);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      ctx.onQuery("");
+    }
+  });
 
   if (ctx.focusSearch) {
     queueMicrotask(() => {

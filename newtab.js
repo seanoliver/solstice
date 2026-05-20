@@ -48,7 +48,7 @@ function ctx() {
     },
     onRemove(row) {
       const idx = zones.findIndex(
-        (z) => z.tz === row.tz && z.label === row.label);
+        (z) => z.tz === row.tz && z.name === row.name);
       zones = removeZone(zones, idx);
       saveZones(zones, store);
       paintBar(); tick();
@@ -61,9 +61,8 @@ function ctx() {
     },
     onRename(row, value) {
       if (row.tz === "local") { this.onHome(value); return; }
-      if (!String(value ?? "").trim()) return;
       const idx = zones.findIndex(
-        (z) => z.tz === row.tz && z.label === row.label);
+        (z) => z.tz === row.tz && z.name === row.name);
       if (idx < 0) return;
       zones = renameZone(zones, idx, value);
       saveZones(zones, store);

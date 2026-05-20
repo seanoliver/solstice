@@ -27,14 +27,39 @@ test("loadZones round-trips a saved list and re-adds local if missing", () => {
   assert.ok(z.some((x) => x.label === "Tokyo"));
 });
 
-test("addZone appends and dedupes by tz+label", () => {
+test("addZone appends with label+name and dedupes by tz+name", () => {
   const base = [{ label: "You", tz: "local", lat: 0, lon: 0 }];
   const city = { name: "Tokyo", tz: "Asia/Tokyo", lat: 35.6, lon: 139.6 };
   const a = addZone(base, city);
   assert.equal(a.length, 2);
   assert.equal(a[1].label, "Tokyo");
+  assert.equal(a[1].name, "Tokyo", "name is recorded");
   const b = addZone(a, city);
   assert.equal(b.length, 2, "duplicate ignored");
+  // Renaming should not break dedup.
+  a[1].label = "Aiko";
+  const c = addZone(a, city);
+  assert.equal(c.length, 2, "dedup uses name, survives custom label");
+});
+
+test("loadZones backfills name from label for legacy data without name", () => {
+  const s = stub();
+  saveZones([
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 35.6, lon: 139.6 },
+  ], s);
+  const z = loadZones(s);
+  const tokyo = z.find((x) => x.tz === "Asia/Tokyo");
+  assert.equal(tokyo.name, "Tokyo", "name backfilled from label");
+});
+
+test("renameZone preserves name when label is cleared", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Steve", name: "Madrid", tz: "Europe/Madrid", lat: 0, lon: 0 },
+  ];
+  const cleared = renameZone(list, 1, "");
+  assert.equal(cleared[1].label, "", "label cleared");
+  assert.equal(cleared[1].name, "Madrid", "name preserved");
 });
 
 test("removeZone removes by index but never the local zone", () => {

@@ -2,10 +2,18 @@ import { ZONES as SEED } from "../config.js";
 
 const isLocal = (z) => z.tz === "local";
 
+// Non-local zones carry a `name` (immutable original) so an empty `label`
+// can fall back to the original city name. Older persisted data lacks it.
+function withName(z) {
+  if (isLocal(z) || z.name) return z;
+  return { ...z, name: z.label };
+}
+
 export function ensureLocal(list) {
-  if (list.some(isLocal)) return list;
+  const normalized = list.map(withName);
+  if (normalized.some(isLocal)) return normalized;
   const seedLocal = SEED.find(isLocal);
-  return seedLocal ? [seedLocal, ...list] : list;
+  return seedLocal ? [seedLocal, ...normalized] : normalized;
 }
 
 export function saveZones(list, storage) {
@@ -17,7 +25,11 @@ export function loadZones(storage) {
     const raw = storage.getItem("zones");
     if (raw) {
       const arr = JSON.parse(raw);
-      if (Array.isArray(arr) && arr.length) return ensureLocal(arr);
+      if (Array.isArray(arr) && arr.length) {
+        const migrated = ensureLocal(arr);
+        if (JSON.stringify(migrated) !== raw) saveZones(migrated, storage);
+        return migrated;
+      }
     }
   } catch { /* fall through to seed */ }
   const seeded = ensureLocal(SEED.map((z) => ({ ...z })));
@@ -26,8 +38,11 @@ export function loadZones(storage) {
 }
 
 export function addZone(list, city) {
-  if (list.some((z) => z.tz === city.tz && z.label === city.name)) return list;
-  return [...list, { label: city.name, tz: city.tz, lat: city.lat, lon: city.lon }];
+  if (list.some((z) => z.tz === city.tz && z.name === city.name)) return list;
+  return [...list, {
+    label: city.name, name: city.name,
+    tz: city.tz, lat: city.lat, lon: city.lon,
+  }];
 }
 
 export function removeZone(list, idx) {

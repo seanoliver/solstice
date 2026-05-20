@@ -84,7 +84,8 @@ export function buildModel(zones, at = new Date(), localLabel = null) {
     } else if (sun.polar === "night") { sunriseMin = 1441; sunsetMin = 1441; }
     const part = partOfDay(minutesOfDay, sunriseMin, sunsetMin);
     return {
-      label: z.tz === "local" ? localCity : z.label, tz: z.tz,
+      label: z.tz === "local" ? localCity
+        : (z.label || z.name || cityFromTz(z.tz)), tz: z.tz,
       hour, minute, label2: label,
       minutesOfDay, sunriseMin, sunsetMin, part,
       segments: daySegments(sunriseMin, sunsetMin),

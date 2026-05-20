@@ -152,6 +152,7 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .zone-label-input { width:100%; background:#11161e; color:var(--txt);
   border:1px solid var(--border); border-radius:4px; padding:.2rem .4rem;
   font:13px/1 ui-sans-serif,system-ui,sans-serif; }
+.zone-label-input::placeholder { color:var(--muted); font-style:italic; }
 .zone-abbr { font:11px/1 "JetBrains Mono",ui-monospace,Menlo,monospace;
   color:var(--muted); letter-spacing:.06em; }
 .zone-x { width:1.4rem; height:1.4rem; border-radius:50%; border:0;

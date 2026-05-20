@@ -180,7 +180,6 @@ function buildSearch(ctx) {
       results.forEach((c, i) => {
         const li = document.createElement("li");
         li.textContent = c.name + "  ·  " + c.tz;
-        li.dataset.idx = String(i);
         li.addEventListener("mouseenter", () => setActive(i));
         li.addEventListener("click", () => ctx.onAdd(c));
         ul.appendChild(li);
@@ -198,6 +197,11 @@ function buildSearch(ctx) {
   }
 
   input.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      ctx.onQuery("");
+      return;
+    }
     if (!results.length) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -210,9 +214,6 @@ function buildSearch(ctx) {
       e.preventDefault();
       const pick = activeIdx >= 0 ? results[activeIdx] : results[0];
       if (pick) ctx.onAdd(pick);
-    } else if (e.key === "Escape") {
-      e.preventDefault();
-      ctx.onQuery("");
     }
   });
 

@@ -1,6 +1,8 @@
 import { buildModel } from "./src/timeModel.js";
 import { renderLive, renderEditBar } from "./src/render.js";
-import { loadZones, saveZones, addZone, removeZone } from "./src/zones.js";
+import {
+  loadZones, saveZones, addZone, removeZone, renameZone, reorderZones,
+} from "./src/zones.js";
 import {
   resolveLocalLabel, needsRefresh, refreshLocation,
   readHome, writeHome,
@@ -23,7 +25,7 @@ let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 
 function ctx() {
   return {
-    editMode, query, cities: CITIES, focusSearch,
+    editMode, query, cities: CITIES, focusSearch, zones,
     home: readHome(store) || "",
     timeMode: timeFmt,
     onTimeMode(m) {
@@ -55,6 +57,20 @@ function ctx() {
       localLabel = resolveLocalLabel(store, null);
       paintBar(); tick();
       if (needsRefresh(store)) refreshGeo(); // cleared home → re-detect
+    },
+    onRename(row, value) {
+      if (row.tz === "local") { this.onHome(value); return; }
+      const idx = zones.findIndex(
+        (z) => z.tz === row.tz && z.label === row.label);
+      if (idx < 0) return;
+      zones = renameZone(zones, idx, value);
+      saveZones(zones, store);
+      paintBar(); tick();
+    },
+    onReorder(fromIdx, toIdx) {
+      zones = reorderZones(zones, fromIdx, toIdx);
+      saveZones(zones, store);
+      paintBar(); tick();
     },
   };
 }

@@ -26,7 +26,6 @@ let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 function ctx() {
   return {
     editMode, query, cities: CITIES, focusSearch, zones,
-    home: readHome(store) || "",
     timeMode: timeFmt,
     onTimeMode(m) {
       if (m !== "12" && m !== "24") return;
@@ -60,6 +59,7 @@ function ctx() {
     },
     onRename(row, value) {
       if (row.tz === "local") { this.onHome(value); return; }
+      if (!String(value ?? "").trim()) return;
       const idx = zones.findIndex(
         (z) => z.tz === row.tz && z.label === row.label);
       if (idx < 0) return;

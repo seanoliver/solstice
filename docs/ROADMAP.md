@@ -8,14 +8,14 @@ menu, roughly prioritized. Contributions welcome.
 1. **Meeting / overlap finder** — pick a subset of zones, highlight the
    hours where they're all in the `work` band. The killer feature for a
    world clock; uniquely useful.
-2. **Drag-to-reorder zones** — the obvious companion to add/remove.
+2. ~~**Drag-to-reorder zones** — the obvious companion to add/remove.~~ Shipped 2026-05-20.
 3. **Publish readiness** — store assets + privacy page (see checklist
    below). Unblocks shipping to the Chrome Web Store.
 
 ## Features
 
 - **Meeting / overlap finder** — common working-hours across selected zones.
-- **Drag-to-reorder zones** in edit mode (persist order in `localStorage`).
+- ~~**Drag-to-reorder zones** in edit mode (persist order in `localStorage`).~~ Shipped 2026-05-20.
 - **Timeline scrub** — drag a playhead to ask "when it's 3pm here, what
   time is it everywhere?" Pairs naturally with the existing timeline.
 - **Per-zone work hours** — override the fixed 9–5 per zone (some people

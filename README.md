@@ -49,13 +49,20 @@ A **12h / 24h** toggle in the top-right switches every time on the page
 3. Click **Load unpacked** and select the project root.
 4. Open a new tab.
 
-## Add / remove cities
+## Edit zones
 
-Click **Edit** (top-right) to enter edit mode: each card except your local
-"You" zone gets an **×** to remove it, and an **Add a city…** search box
-appears — type a name, click a result. Click **Done** to return to the calm
-default view. Your zone list persists in `localStorage` across new tabs and
-restarts. The local zone is pinned and cannot be removed.
+Click **Edit** (bottom-right) to open the edit panel. Inside the panel:
+
+- Drag the `≡` handle on any row to reorder zones — the cards (left→right)
+  and timeline (top→bottom) follow the new order.
+- Click a zone's label to rename it (e.g. "Madrid" → "Steve"). The IANA
+  timezone abbreviation stays read-only beside the label.
+- Click `×` (in the panel or on the card itself) to remove a zone.
+- Use the search box at the bottom to add a city. Arrow keys cycle through
+  matches; Enter adds the highlighted (or first) result.
+
+The local zone is anchored first and can't be removed or reordered, but its
+label is editable — clearing it re-runs geolocation/IP detection.
 
 The searchable city list lives in `cities.js` (`{ name, tz, lat, lon }`);
 append rows to extend it.

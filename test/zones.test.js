@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { loadZones, saveZones, addZone, removeZone, renameZone } from "../src/zones.js";
+import { loadZones, saveZones, addZone, removeZone, renameZone, reorderZones } from "../src/zones.js";
 
 function stub() {
   const mem = {};
@@ -66,4 +66,52 @@ test("renameZone is a no-op for out-of-range idx", () => {
   const list = [{ label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 }];
   assert.equal(renameZone(list, 5, "X"), list);
   assert.equal(renameZone(list, -1, "X"), list);
+});
+
+test("reorderZones moves item forward", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 },
+    { label: "London", tz: "Europe/London", lat: 0, lon: 0 },
+    { label: "NYC", tz: "America/New_York", lat: 0, lon: 0 },
+  ];
+  const r = reorderZones(list, 1, 3);
+  assert.deepEqual(r.map((z) => z.label), ["You", "London", "NYC", "Tokyo"]);
+});
+
+test("reorderZones moves item backward", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "A", tz: "Etc/UTC", lat: 0, lon: 0 },
+    { label: "B", tz: "Etc/UTC", lat: 0, lon: 0 },
+    { label: "C", tz: "Etc/UTC", lat: 0, lon: 0 },
+  ];
+  const r = reorderZones(list, 3, 1);
+  assert.deepEqual(r.map((z) => z.label), ["You", "C", "A", "B"]);
+});
+
+test("reorderZones refuses to move the local zone", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 },
+  ];
+  assert.equal(reorderZones(list, 0, 1), list, "local stays put");
+});
+
+test("reorderZones refuses to drop into idx 0 (local anchor)", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 },
+  ];
+  assert.equal(reorderZones(list, 1, 0), list, "anchor protected");
+});
+
+test("reorderZones is a no-op when from === to or out of range", () => {
+  const list = [
+    { label: "You", tz: "local", lat: 0, lon: 0 },
+    { label: "Tokyo", tz: "Asia/Tokyo", lat: 0, lon: 0 },
+  ];
+  assert.equal(reorderZones(list, 1, 1), list);
+  assert.equal(reorderZones(list, 5, 1), list);
+  assert.equal(reorderZones(list, 1, -1), list);
 });

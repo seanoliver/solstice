@@ -41,3 +41,15 @@ export function renameZone(list, idx, newLabel) {
   const label = String(newLabel ?? "").trim();
   return list.map((z, i) => (i === idx ? { ...z, label } : z));
 }
+
+export function reorderZones(list, fromIdx, toIdx) {
+  if (fromIdx === toIdx) return list;
+  if (fromIdx < 0 || fromIdx >= list.length) return list;
+  if (toIdx < 0 || toIdx >= list.length) return list;
+  if (isLocal(list[fromIdx])) return list;
+  if (toIdx === 0) return list;
+  const next = list.slice();
+  const [item] = next.splice(fromIdx, 1);
+  next.splice(toIdx, 0, item);
+  return next;
+}

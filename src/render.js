@@ -197,6 +197,7 @@ function attachDrag(listEl, ctx) {
   let state = null;
 
   listEl.addEventListener("pointerdown", (e) => {
+    if (state) return;
     const handle = e.target.closest(".drag-handle");
     if (!handle) return;
     const row = handle.closest(".zone-row");
@@ -211,7 +212,7 @@ function attachDrag(listEl, ctx) {
     const rect = row.getBoundingClientRect();
     const rowH = rect.height;
     state = {
-      pointerId: e.pointerId, handle, row, rows, fromIdx,
+      pointerId: e.pointerId, row, rows, fromIdx,
       startY: e.clientY, rowH, currentTarget: fromIdx,
     };
     row.classList.add("dragging");

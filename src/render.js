@@ -396,37 +396,40 @@ export function renderLive(model, liveEl, now, ctx) {
     }
   }
 
-  const tl = document.createElement("section");
-  tl.className = "panel timeline";
-  tl.innerHTML =
-    `<div class="kicker">24 Hour Timeline</div>` +
-    `<div class="tl-axis"><span>00</span><span>06</span>` +
-    `<span>12</span><span>18</span><span>24</span></div>`;
-  for (const r of model) {
-    const row = document.createElement("div");
-    row.className = "tlrow";
-    const lab = document.createElement("span");
-    lab.className = "tllab";
-    lab.textContent = r.label;
-    const end = document.createElement("span");
-    end.className = "tlend";
-    const time = document.createElement("span");
-    time.className = "tltime";
-    const rt = formatHM(r.hour, r.minute, mode);
-    time.textContent = rt.ap ? `${rt.hm} ${rt.ap}` : rt.hm;
-    const chip = document.createElement("span");
-    chip.className = "tlday"; // always present → reserves constant width
-    if (r.dayOffset !== 0) {
-      chip.classList.add("on");
-      chip.textContent =
-        (r.dayOffset > 0 ? "+" : "−") + Math.abs(r.dayOffset);
-      chip.title = r.dateLabel;
+  // Timeline's value is comparing zones — skip it when there's only one.
+  if (model.length > 1) {
+    const tl = document.createElement("section");
+    tl.className = "panel timeline";
+    tl.innerHTML =
+      `<div class="kicker">24 Hour Timeline</div>` +
+      `<div class="tl-axis"><span>00</span><span>06</span>` +
+      `<span>12</span><span>18</span><span>24</span></div>`;
+    for (const r of model) {
+      const row = document.createElement("div");
+      row.className = "tlrow";
+      const lab = document.createElement("span");
+      lab.className = "tllab";
+      lab.textContent = r.label;
+      const end = document.createElement("span");
+      end.className = "tlend";
+      const time = document.createElement("span");
+      time.className = "tltime";
+      const rt = formatHM(r.hour, r.minute, mode);
+      time.textContent = rt.ap ? `${rt.hm} ${rt.ap}` : rt.hm;
+      const chip = document.createElement("span");
+      chip.className = "tlday";
+      if (r.dayOffset !== 0) {
+        chip.classList.add("on");
+        chip.textContent =
+          (r.dayOffset > 0 ? "+" : "−") + Math.abs(r.dayOffset);
+        chip.title = r.dateLabel;
+      }
+      end.append(time, chip);
+      row.append(lab, stripEl(r, true), end);
+      tl.appendChild(row);
     }
-    end.append(time, chip);
-    row.append(lab, stripEl(r, true), end);
-    tl.appendChild(row);
+    liveEl.appendChild(tl);
   }
-  liveEl.appendChild(tl);
 
   const leg = document.createElement("section");
   leg.className = "panel legend";

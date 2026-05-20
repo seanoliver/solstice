@@ -43,7 +43,7 @@ function ctx() {
     onAdd(city) {
       zones = addZone(zones, city);
       saveZones(zones, store);
-      query = ""; focusSearch = false;
+      query = ""; focusSearch = true;
       paintBar(); tick();
     },
     onRemove(row) {

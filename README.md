@@ -59,13 +59,17 @@ Click **Edit** (bottom-right) to open the edit panel. Inside the panel:
   timezone abbreviation stays read-only beside the label.
 - Click `×` (in the panel or on the card itself) to remove a zone.
 - Use the search box at the bottom to add a city. Arrow keys cycle through
-  matches; Enter adds the highlighted (or first) result.
+  matches; Enter adds the highlighted (or first) result. The input stays
+  focused after each add so you can rapid-fire several cities in a row.
 
 The local zone is anchored first and can't be removed or reordered, but its
 label is editable — clearing it re-runs geolocation/IP detection.
 
-The searchable city list lives in `cities.js` (`{ name, tz, lat, lon }`);
-append rows to extend it.
+The bundled city list lives in `cities.js` (`{ name, tz, lat, lon }`);
+append rows to extend it. If a search returns no local match, the panel
+falls back to Open-Meteo's free geocoding API
+(`https://geocoding-api.open-meteo.com`) so you can add any city in the
+world — debounced 250ms, results cached per query.
 
 ## Configure (defaults)
 

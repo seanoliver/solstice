@@ -8,7 +8,8 @@
     "https://api.bigdatacloud.net/*",
     "https://ipwho.is/*",
     "https://ipapi.co/*",
-    "https://get.geojs.io/*"
+    "https://get.geojs.io/*",
+    "https://geocoding-api.open-meteo.com/*"
   ],
   "chrome_url_overrides": { "newtab": "newtab.html" }
 }

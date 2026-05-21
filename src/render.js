@@ -1,6 +1,14 @@
 import { PALETTE } from "./dayPart.js";
 import { formatHM } from "./timeModel.js";
 import { gridColumns } from "./layout.js";
+import { searchCitiesRemote } from "./cityLookup.js";
+
+// Module-scoped remote-search state. The panel rebuilds per keystroke; this
+// state survives across renders so the debounce timer and abort controller
+// don't reset on every input event.
+let remoteTimer = null;
+let remoteAbort = null;
+const remoteCache = new Map();
 
 function timeMode(ctx) {
   return ctx && ctx.timeMode === "24" ? "24" : "12";
@@ -180,35 +188,74 @@ function buildSearch(ctx) {
   let activeIdx = -1;
   let ul = null;
 
-  if (q) {
-    results = ctx.cities
-      .filter((c) => c.name.toLowerCase().includes(q))
-      .slice(0, 8);
-    ul = document.createElement("ul");
-    ul.className = "results";
-    if (!results.length) {
-      const li = document.createElement("li");
-      li.className = "empty";
-      li.textContent = "No match";
-      ul.appendChild(li);
-    } else {
-      results.forEach((c, i) => {
-        const li = document.createElement("li");
-        li.textContent = c.name + "  ·  " + c.tz;
-        li.addEventListener("mouseenter", () => setActive(i));
-        li.addEventListener("click", () => ctx.onAdd(c));
-        ul.appendChild(li);
-      });
-    }
-    wrap.appendChild(ul);
-  }
-
   function setActive(i) {
     activeIdx = i;
     if (!ul) return;
     Array.from(ul.children).forEach((li, idx) => {
       li.classList.toggle("active", idx === i);
     });
+  }
+
+  function fmtResult(c) {
+    const tail = c.where ? `${c.name}, ${c.where}` : c.name;
+    return `${tail}  ·  ${c.tz}`;
+  }
+
+  function renderRows(rows) {
+    results = rows;
+    activeIdx = -1;
+    ul.innerHTML = "";
+    if (!rows.length) {
+      const li = document.createElement("li");
+      li.className = "empty";
+      li.textContent = "No match";
+      ul.appendChild(li);
+      return;
+    }
+    rows.forEach((c, i) => {
+      const li = document.createElement("li");
+      li.textContent = fmtResult(c);
+      li.addEventListener("mouseenter", () => setActive(i));
+      li.addEventListener("click", () => ctx.onAdd(c));
+      ul.appendChild(li);
+    });
+  }
+
+  if (q) {
+    ul = document.createElement("ul");
+    ul.className = "results";
+    const localHits = ctx.cities
+      .filter((c) => c.name.toLowerCase().includes(q))
+      .slice(0, 8);
+
+    if (localHits.length) {
+      renderRows(localHits);
+    } else if (q.length >= 2) {
+      const cached = remoteCache.get(q);
+      if (cached) {
+        renderRows(cached);
+      } else {
+        const loading = document.createElement("li");
+        loading.className = "empty";
+        loading.textContent = "Searching…";
+        ul.appendChild(loading);
+        scheduleRemote(q, ul, (rows, err) => {
+          if (!ul.isConnected) return;
+          if (err) {
+            ul.innerHTML = "";
+            const li = document.createElement("li");
+            li.className = "empty";
+            li.textContent = "Search failed";
+            ul.appendChild(li);
+            return;
+          }
+          renderRows(rows);
+        });
+      }
+    } else {
+      renderRows([]);
+    }
+    wrap.appendChild(ul);
   }
 
   input.addEventListener("keydown", (e) => {
@@ -240,6 +287,23 @@ function buildSearch(ctx) {
     });
   }
   return wrap;
+}
+
+function scheduleRemote(q, ul, onDone) {
+  if (remoteTimer) clearTimeout(remoteTimer);
+  if (remoteAbort) remoteAbort.abort();
+  remoteTimer = setTimeout(async () => {
+    remoteTimer = null;
+    remoteAbort = new AbortController();
+    try {
+      const rows = await searchCitiesRemote(q, remoteAbort.signal);
+      remoteCache.set(q, rows);
+      onDone(rows, null);
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+      onDone([], err);
+    }
+  }, 250);
 }
 
 function attachDrag(listEl, ctx) {

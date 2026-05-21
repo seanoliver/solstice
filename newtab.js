@@ -1,5 +1,5 @@
 import { buildModel } from "./src/timeModel.js";
-import { renderLive, renderEditBar } from "./src/render.js";
+import { renderLive, updateLive, renderEditBar } from "./src/render.js";
 import {
   loadZones, saveZones, addZone, removeZone, renameZone, reorderZones,
 } from "./src/zones.js";
@@ -33,30 +33,30 @@ function ctx() {
       if (m !== "12" && m !== "24") return;
       timeFmt = m;
       store.setItem("timeFmt", m);
-      tick();
+      paintLive();
     },
     onToggle() {
       editMode = !editMode; query = ""; focusSearch = false;
-      paintBar(); tick();
+      paintBar(); paintLive();
     },
     onQuery(v) { query = v; focusSearch = true; paintBar(); },
     onAdd(city) {
       zones = addZone(zones, city);
       saveZones(zones, store);
       query = ""; focusSearch = true;
-      paintBar(); tick();
+      paintBar(); paintLive();
     },
     onRemove(row) {
       const idx = zones.findIndex(
         (z) => z.tz === row.tz && z.name === row.name);
       zones = removeZone(zones, idx);
       saveZones(zones, store);
-      paintBar(); tick();
+      paintBar(); paintLive();
     },
     onHome(value) {
       writeHome(store, value);
       localLabel = resolveLocalLabel(store, null);
-      paintBar(); tick();
+      paintBar(); paintLive();
       if (needsRefresh(store)) refreshGeo(); // cleared home → re-detect
     },
     onRename(row, value) {
@@ -66,25 +66,33 @@ function ctx() {
       if (idx < 0) return;
       zones = renameZone(zones, idx, value);
       saveZones(zones, store);
-      paintBar(); tick();
+      paintBar(); paintLive();
     },
     onReorder(fromIdx, toIdx) {
       zones = reorderZones(zones, fromIdx, toIdx);
       saveZones(zones, store);
-      paintBar(); tick();
+      paintBar(); paintLive();
     },
   };
 }
 
 function paintBar() { renderEditBar(editbar, ctx()); }
 
-function tick() {
+// Full structural rebuild of `live`. Used on zone/format/edit changes and
+// resize. Wiping the subtree momentarily collapses page height, so preserve
+// scroll position across the swap.
+function paintLive() {
   const now = new Date();
-  // renderLive wipes and rebuilds `live`, which momentarily collapses page
-  // height and makes the browser clamp scroll to the top. Preserve it.
   const y = window.scrollY;
   renderLive(buildModel(zones, now, localLabel), live, now, ctx());
   if (window.scrollY !== y) window.scrollTo(0, y);
+}
+
+// 1Hz update: patch only the time-derived nodes in place (no teardown, so
+// no height collapse and no scroll juggling).
+function tick() {
+  const now = new Date();
+  updateLive(buildModel(zones, now, localLabel), live, now, ctx());
 }
 
 // Render immediately with whatever the cascade already knows; upgrade when
@@ -93,17 +101,18 @@ async function refreshGeo() {
   const city = await refreshLocation(store);
   if (city) {
     localLabel = resolveLocalLabel(store, null);
-    tick();
+    paintLive();
   }
 }
 
 paintBar();
-tick();
+paintLive();
 setInterval(tick, 1000);
 if (needsRefresh(store)) refreshGeo();
 
+// Card-grid column count depends on width, so resize needs a full rebuild.
 let resizeRaf;
 window.addEventListener("resize", () => {
   cancelAnimationFrame(resizeRaf);
-  resizeRaf = requestAnimationFrame(tick);
+  resizeRaf = requestAnimationFrame(paintLive);
 });

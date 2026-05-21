@@ -37,7 +37,29 @@ function stripEl(row, tall) {
   m.className = "marker";
   m.style.left = row.dayProgress * 100 + "%";
   strip.appendChild(m);
+  // Refs for in-place updates; segments are ~constant within a day and only
+  // refreshed on a full render, so the tick just moves the marker + dim edge.
+  strip._future = future;
+  strip._marker = m;
   return strip;
+}
+
+function updateStrip(strip, row) {
+  const pct = row.dayProgress * 100 + "%";
+  if (strip._future) strip._future.style.left = pct;
+  if (strip._marker) strip._marker.style.left = pct;
+}
+
+function clockInner(t, ss) {
+  return `${t.hm.replace(":", '<i class="cl">:</i>')}` +
+    `<span class="rt"><span class="secs">:${ss}</span>` +
+    `<sub class="ap">${t.ap}</sub></span>`;
+}
+
+function fullDate(now) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long", month: "long", day: "numeric", year: "numeric",
+  }).format(now);
 }
 
 let panelMounted = false;
@@ -367,12 +389,17 @@ export function renderLive(model, liveEl, now, ctx) {
   const local = model.find((r) => r.tz === "local") || model[0];
   const t = formatHM(local.hour, local.minute, mode);
   const ss = String(now.getSeconds()).padStart(2, "0");
-  const dateStr = new Intl.DateTimeFormat("en-US", {
-    weekday: "long", month: "long", day: "numeric", year: "numeric",
-  }).format(now);
 
   liveEl.innerHTML = "";
   liveEl.className = "live wt";
+
+  // Refs to the time-derived nodes so the 1Hz tick can patch them in place
+  // (see updateLive) instead of rebuilding the whole subtree every second.
+  const soloZone = model.length === 1;
+  const refs = {
+    mode, solo: soloZone, today: null, clockBig: null,
+    soloMeta: null, soloDate: null, soloStrip: null, cards: [], rows: [],
+  };
 
   const top = document.createElement("header");
   top.className = "topbar";
@@ -383,7 +410,8 @@ export function renderLive(model, liveEl, now, ctx) {
   right.className = "topright";
   const today = document.createElement("span");
   today.className = "today";
-  today.textContent = dateStr;
+  today.textContent = fullDate(now);
+  refs.today = today;
   const fmt = document.createElement("div");
   fmt.className = "fmt";
   fmt.setAttribute("role", "group");
@@ -400,14 +428,9 @@ export function renderLive(model, liveEl, now, ctx) {
   top.append(brand, right);
   liveEl.appendChild(top);
 
-  const soloZone = model.length === 1;
-
   const clock = document.createElement("section");
   clock.className = "clock" + (soloZone ? " clock-solo" : "");
-  const bigHtml =
-    `<div class="big">${t.hm.replace(":", '<i class="cl">:</i>')}` +
-    `<span class="rt"><span class="secs">:${ss}</span>` +
-    `<sub class="ap">${t.ap}</sub></span></div>`;
+  const bigHtml = `<div class="big">${clockInner(t, ss)}</div>`;
   if (soloZone) {
     clock.innerHTML = bigHtml;
     const meta = document.createElement("div");
@@ -416,10 +439,15 @@ export function renderLive(model, liveEl, now, ctx) {
     const date = document.createElement("div");
     date.className = "solo-date";
     date.textContent = local.dateLabel;
-    clock.append(meta, date, stripEl(local, true));
+    const strip = stripEl(local, true);
+    clock.append(meta, date, strip);
+    refs.soloMeta = meta;
+    refs.soloDate = date;
+    refs.soloStrip = strip;
   } else {
     clock.innerHTML = `<div class="kicker">LOCAL TIME</div>` + bigHtml;
   }
+  refs.clockBig = clock.querySelector(".big");
   liveEl.appendChild(clock);
 
   if (!soloZone) {
@@ -453,7 +481,9 @@ export function renderLive(model, liveEl, now, ctx) {
       const date = document.createElement("div");
       date.className = "card-date";
       date.textContent = r.dateLabel;
-      c.append(head, city, time, date, stripEl(r, false));
+      const strip = stripEl(r, false);
+      c.append(head, city, time, date, strip);
+      refs.cards.push({ time, dot: head.querySelector(".dot"), date, strip });
       if (ctx && ctx.editMode && r.tz !== "local") {
         const x = document.createElement("button");
         x.className = "card-x";
@@ -502,7 +532,9 @@ export function renderLive(model, liveEl, now, ctx) {
         chip.title = r.dateLabel;
       }
       end.append(time, chip);
-      row.append(lab, stripEl(r, true), end);
+      const strip = stripEl(r, true);
+      row.append(lab, strip, end);
+      refs.rows.push({ strip, time, chip });
       tl.appendChild(row);
     }
     liveEl.appendChild(tl);
@@ -518,4 +550,58 @@ export function renderLive(model, liveEl, now, ctx) {
     `<span><i style="background:${PALETTE.night}"></i>Night</span>` +
     `</div>`;
   liveEl.appendChild(leg);
+
+  liveEl._wtRefs = refs;
+}
+
+// Patch only the time-derived nodes on the structure built by renderLive.
+// Falls back to a full render if the structure doesn't match the model
+// (zone count changed, solo↔multi flip, format change).
+export function updateLive(model, liveEl, now, ctx) {
+  const refs = liveEl._wtRefs;
+  const mode = timeMode(ctx);
+  const soloZone = model.length === 1;
+  const matches = refs && refs.solo === soloZone && refs.mode === mode &&
+    (soloZone || (refs.cards.length === model.length &&
+      refs.rows.length === model.length));
+  if (!matches) { renderLive(model, liveEl, now, ctx); return; }
+
+  const local = model.find((r) => r.tz === "local") || model[0];
+  const t = formatHM(local.hour, local.minute, mode);
+  const ss = String(now.getSeconds()).padStart(2, "0");
+  refs.clockBig.innerHTML = clockInner(t, ss);
+  refs.today.textContent = fullDate(now);
+
+  if (soloZone) {
+    refs.soloMeta.textContent = `${local.label} · ${local.tzAbbrev}`;
+    refs.soloDate.textContent = local.dateLabel;
+    updateStrip(refs.soloStrip, local);
+    return;
+  }
+
+  model.forEach((r, i) => {
+    const c = refs.cards[i];
+    const ct = formatHM(r.hour, r.minute, mode);
+    c.time.innerHTML = `${ct.hm}<sub>${ct.ap}</sub>`;
+    c.dot.style.background = PALETTE[r.part];
+    c.date.textContent = r.dateLabel;
+    updateStrip(c.strip, r);
+  });
+
+  model.forEach((r, i) => {
+    const row = refs.rows[i];
+    const rt = formatHM(r.hour, r.minute, mode);
+    row.time.textContent = rt.ap ? `${rt.hm} ${rt.ap}` : rt.hm;
+    if (r.dayOffset !== 0) {
+      row.chip.classList.add("on");
+      row.chip.textContent =
+        (r.dayOffset > 0 ? "+" : "−") + Math.abs(r.dayOffset);
+      row.chip.title = r.dateLabel;
+    } else {
+      row.chip.classList.remove("on");
+      row.chip.textContent = "";
+      row.chip.removeAttribute("title");
+    }
+    updateStrip(row.strip, r);
+  });
 }

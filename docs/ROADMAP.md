@@ -42,8 +42,10 @@ menu, roughly prioritized. Contributions welcome.
   AM/PM-as-night entry exists; the `letter-spacing` and `hour12`/
   `hourCycle` fixes are worth recording for an OSS repo).
 - **CI** — run `node --test` on PRs.
-- **Reduce reflow** — `renderLive` rebuilds the whole DOM every second;
-  fine today, but a diff/update path would be tidier if features grow.
+- ~~**Reduce reflow** — `renderLive` rebuilds the whole DOM every second;
+  fine today, but a diff/update path would be tidier if features grow.~~
+  Shipped 2026-05-21: the 1Hz tick now patches only time-derived nodes in
+  place (`updateLive`); full rebuild only on structural changes.
 
 ## Publish to Chrome Web Store — checklist
 

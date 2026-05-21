@@ -80,7 +80,11 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 
 function tick() {
   const now = new Date();
+  // renderLive wipes and rebuilds `live`, which momentarily collapses page
+  // height and makes the browser clamp scroll to the top. Preserve it.
+  const y = window.scrollY;
   renderLive(buildModel(zones, now, localLabel), live, now, ctx());
+  if (window.scrollY !== y) window.scrollTo(0, y);
 }
 
 // Render immediately with whatever the cascade already knows; upgrade when

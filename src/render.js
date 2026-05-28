@@ -405,7 +405,7 @@ export function renderLive(model, liveEl, now, ctx) {
   top.className = "topbar";
   const brand = document.createElement("span");
   brand.className = "brand";
-  brand.innerHTML = `<i></i>WORLD TIME`;
+  brand.innerHTML = `<i></i>SOLSTICE`;
   const right = document.createElement("div");
   right.className = "topright";
   const today = document.createElement("span");

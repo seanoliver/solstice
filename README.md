@@ -1,4 +1,4 @@
-# World Time New Tab
+# Solstice
 
 A near-zero-permission Chrome MV3 extension that replaces the new-tab page
 with a single, muted, modern world-clock. Permissions are limited to

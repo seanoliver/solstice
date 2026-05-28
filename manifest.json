@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Timezones New Tab",
+  "name": "Solstice",
   "version": "1.0.0",
   "description": "A readable simultaneous view of my timezones.",
   "permissions": ["geolocation"],

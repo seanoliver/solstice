@@ -67,8 +67,9 @@ menu, roughly prioritized. Contributions welcome.
       zone set already shipped.)
 - [ ] Manifest hygiene: bump `version`, add `homepage_url`, author.
 - [x] `LICENSE` — MIT.
-- [ ] Repo: `README` install-from-source section, `CONTRIBUTING` note,
-      screenshot in README.
+- [x] `README`: public-facing rewrite, icon + 2 screenshots, install-from-
+      source, contributions pointer to ROADMAP. (Standalone `CONTRIBUTING.md`
+      still optional.)
 - [x] Remove anything personal from default `config.js` — neutral set
       (Local + New York + London + Tokyo).
 

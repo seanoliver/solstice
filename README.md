@@ -1,128 +1,124 @@
-# Solstice
+<p align="center">
+  <img src="assets/icons/icon-128.png" width="96" height="96" alt="Solstice icon" />
+</p>
 
-A near-zero-permission Chrome MV3 extension that replaces the new-tab page
-with a single, muted, modern world-clock. Permissions are limited to
-`geolocation` plus one `host_permissions` entry
-(`https://api.bigdatacloud.net/*`) for optional precise local-city
-detection; everything else is offline. One page shows:
+<h1 align="center">Solstice</h1>
 
-- a big local clock,
-- per-zone cards with day-part-banded progress bars,
-- a 24-hour banded timeline across all zones,
-- a color key.
+<p align="center">
+  A calm new tab that shows your timezones at a glance — with day and night at each.
+</p>
 
-Sunrise and sunset are computed offline (NOAA algorithm) from each zone's
-latitude/longitude in `config.js`. Each day is banded into four parts:
+<p align="center">
+  <img src="assets/screenshots/hero.png" width="820" alt="Solstice new tab — a big local clock above a row of timezone cards and a 24-hour timeline" />
+</p>
+
+Solstice replaces Chrome's new tab with a single, quiet world clock. A big
+local time up top, a card for every place you care about, and a 24-hour
+timeline that makes the whole day legible at once. Each clock is shaded by
+where the sun actually is — so you can tell, without doing the math, who's
+asleep, who's mid-morning, and who's wrapping up their day.
+
+No accounts, no feeds, no clutter. Open a tab, get your bearings, move on.
+
+## Why you might like it
+
+- **Glanceable.** One screen answers "what time is it for them, and is now a
+  good time to ping?"
+- **Day & night, for real.** Sunrise and sunset are computed for each city's
+  coordinates, so the colored bands reflect the actual day — not a guess.
+- **Yours in seconds.** Add or remove cities, drag to reorder, rename a zone
+  to a person's name, flip the whole page between 12h and 24h.
+- **Quiet by design.** Muted palette, monospace numerals, nothing blinking
+  for your attention.
+
+## Day & night at a glance
+
+Every clock — the cards and the timeline — is banded by time of day, with the
+light hours derived from real sunrise/sunset for that location:
 
 - **Morning** — sunrise → 9am
 - **Work** — 9am → 5pm
 - **Evening** — 5pm → sunset
 - **Night**
 
-The local card's city label resolves through a cascade (highest priority
-first):
+A dot marks "now" on each track, and the part of the day still ahead is dimmed
+so the current moment reads instantly. Cities on a different calendar day get a
+small `+1` / `−1` chip.
 
-1. **Manual home** — a label you type in Edit mode. Honored verbatim
-   (even "New York, NY" while you're on Pacific time — it only changes the
-   label, not the clock's timezone). Persists, no TTL, and short-circuits
-   all detection/network. Clear it (empty the field) to return to auto.
-2. **Browser Geolocation** — Wi-Fi/GPS-accurate, reverse-geocoded via
-   BigDataCloud. Cached in `localStorage` 24h.
-3. **IP geolocation** — approximate (ipwho.is → ipapi.co → geojs.io),
-   used only if Geolocation is denied/unavailable. Cached 24h.
-4. **Timezone city** — offline default (e.g. `America/Los_Angeles` →
-   "Los Angeles").
+## Edit your zones
 
-The page renders the best already-known label immediately and upgrades
-when detection resolves. Attempts log under `[geo]` in the console.
-The page always renders the timezone city immediately and silently upgrades
-to the IP city when it resolves — no blocking, no failure surfaced.
+<p align="center">
+  <img src="assets/screenshots/edit.png" width="820" alt="Solstice edit panel — reorder, rename, remove zones, and search to add any city" />
+</p>
 
-A **12h / 24h** toggle in the top-right switches every time on the page
-(hero clock, cards, and the 24-hour timeline) at once. Default is 12-hour
-(AM/PM); the choice persists in `localStorage`.
+Click **Edit** (bottom-right) to open the panel:
+
+- **Drag** the `≡` handle to reorder — cards (left→right) and timeline
+  (top→bottom) follow.
+- **Rename** a zone by clicking its label (e.g. "Madrid" → "Steve").
+- **Remove** with the `×` (in the panel or on the card).
+- **Add** by searching — type a few letters and pick a match. Bundled cities
+  resolve instantly; anything else falls back to a free geocoding lookup so
+  you can add essentially any city on earth.
+
+Your local card is anchored first and labels itself with your city
+automatically. Don't like the guess? Type your own home label and it sticks.
+
+A **12h / 24h** toggle in the top-right switches every time on the page at
+once. Everything you change persists locally between tabs.
 
 ## Install
 
-1. Open `chrome://extensions`.
-2. Enable **Developer mode** (top right).
-3. Click **Load unpacked** and select the project root.
+Until it's on the Chrome Web Store, load it unpacked:
+
+1. Clone or download this repo.
+2. Open `chrome://extensions` and enable **Developer mode** (top right).
+3. Click **Load unpacked** and select the project folder.
 4. Open a new tab.
 
-## Edit zones
+## Configure defaults
 
-Click **Edit** (bottom-right) to open the edit panel. Inside the panel:
-
-- Drag the `≡` handle on any row to reorder zones — the cards (left→right)
-  and timeline (top→bottom) follow the new order.
-- Click a zone's label to rename it (e.g. "Madrid" → "Steve"). The IANA
-  timezone abbreviation stays read-only beside the label.
-- Click `×` (in the panel or on the card itself) to remove a zone.
-- Use the search box at the bottom to add a city. Arrow keys cycle through
-  matches; Enter adds the highlighted (or first) result. The input stays
-  focused after each add so you can rapid-fire several cities in a row.
-
-The local zone is anchored first and can't be removed or reordered, but its
-label is editable — clearing it re-runs geolocation/IP detection.
-
-The bundled city list lives in `cities.js` (`{ name, tz, lat, lon }`);
-append rows to extend it. If a search returns no local match, the panel
-falls back to Open-Meteo's free geocoding API
-(`https://geocoding-api.open-meteo.com`) so you can add any city in the
-world — debounced 250ms, results cached per query.
-
-## Configure (defaults)
-
-`config.js` `ZONES` is only the **first-run seed** — once you've edited the
-list via the UI, `localStorage` is the source of truth. To change the
-out-of-box defaults (or reset: clear the `zones` key in `localStorage`),
-edit `config.js`:
+The starting set of cities lives in `config.js`, but it's only the first-run
+seed — once you edit zones in the UI, your choices (stored locally) take over.
+To change the out-of-box defaults, edit the `ZONES` array:
 
 ```js
 export const ZONES = [
-  { label: "You",    tz: "local",         lat: 37.7749, lon: -122.4194 },
+  { label: "You",    tz: "local",         lat: 40.7128, lon: -74.0060 },
   { label: "London", tz: "Europe/London", lat: 51.5074, lon: -0.1278  },
 ];
 ```
 
-Each entry has a `label`, a `tz` (an IANA timezone string, or `"local"` for
-the browser's local time), and `lat`/`lon` used for offline sunrise/sunset.
-Array order is the display order; the `"local"` zone is rendered first.
+Each entry has a `label`, an IANA `tz` (or `"local"` for the browser's own
+timezone), and `lat`/`lon` used to compute sunrise/sunset. Array order is the
+display order; the `"local"` zone always renders first.
 
-## Tests
+## Privacy
 
-Run the `node:test` unit suite (covers the time model, sun, band, and
-day-part logic) from the project root:
+No servers, no accounts, no analytics, no tracking. Your settings live in your
+browser. Location, if you allow it, is used only to label your local card with
+a city name and is cached locally. Full details in [PRIVACY.md](PRIVACY.md).
+
+## Development
+
+No build step — it's vanilla ES modules. Run the unit tests (time model, sun
+math, day-part bands) with:
 
 ```bash
 node --test
 ```
 
-## Project layout
+Project layout:
 
-- `manifest.json` — MV3 manifest, overrides the new-tab page.
-- `newtab.html` / `newtab.css` / `newtab.js` — page markup, styles, and app
-  wiring (tick loop).
-- `config.js` — the first-run default `ZONES` list (`{ label, tz, lat, lon }`).
-- `cities.js` — bundled searchable city dataset (`{ name, tz, lat, lon }`).
-- `assets/fonts/` — bundled JetBrains Mono variable woff2 (offline, OFL).
-- The card grid is responsive to **both** width and card count: ≤5 → one
-  row; 6+ → balanced rows (3×2, 4+3, …), capped at 5 wide, never a lone
-  orphan card. Reflows on resize.
+- `manifest.json` — MV3 manifest; overrides the new-tab page.
+- `newtab.html` / `newtab.css` / `newtab.js` — page, styles, app wiring.
+- `config.js` — first-run default zones. `cities.js` — bundled city dataset.
+- `src/` — `timeModel.js`, `sun.js` (sunrise/sunset), `bands.js`,
+  `dayPart.js`, `zones.js` (storage), `geo.js` (location), `layout.js`
+  (responsive grid), `cityLookup.js` (remote search), `render.js`.
+- `test/` — `node:test` unit suites. `docs/` — design notes & roadmap.
 
-- `src/` — `timeModel.js` (zone-row builder), `layout.js` (card-grid
-  column count), `sun.js` (offline NOAA
-  sunrise/sunset), `bands.js` (day-part band segments), `dayPart.js`
-  (day-part bucketing + shared palette), `zones.js` (localStorage zone
-  store: seed/add/remove, local pinned), `geo.js` (cached IP city lookup
-  with offline fallback), and `render.js` (single-page renderer + edit bar).
-- `test/` — `node:test` unit suites.
-- `docs/plans/` — implementation plan.
-
-## Privacy
-
-No servers, accounts, analytics, or tracking. Location is used only to
-label your local card and is cached locally. See [PRIVACY.md](PRIVACY.md).
+Contributions welcome — see [docs/ROADMAP.md](docs/ROADMAP.md) for ideas.
 
 ## License
 

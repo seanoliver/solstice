@@ -1,11 +1,13 @@
-// Each zone: label, IANA tz (or "local"), and lat/lon for offline
-// sunrise/sunset computation. Add a row to add a city.
+// Default zones shown on first install. The local zone's IANA timezone is
+// "local" (resolves to the user's system tz at runtime). Coords are used
+// for offline sunrise/sunset; the geo cascade in src/geo.js may override
+// the *label* with the detected city, but not these coords (see ROADMAP).
+//
+// Users add/remove zones at runtime via Edit mode; this list only seeds
+// the first install.
 export const ZONES = [
-  { label: "You",       tz: "local",                lat: 37.7749,  lon: -122.4194 },
-  { label: "SF/LA",     tz: "America/Los_Angeles",  lat: 37.7749,  lon: -122.4194 },
-  { label: "London",    tz: "Europe/London",        lat: 51.5074,  lon: -0.1278  },
-  { label: "Berlin",    tz: "Europe/Berlin",        lat: 52.5200,  lon: 13.4050  },
-  { label: "Singapore", tz: "Asia/Singapore",       lat: 1.3521,   lon: 103.8198 },
-  { label: "Beijing",   tz: "Asia/Shanghai",        lat: 39.9042,  lon: 116.4074 },
-  { label: "Sydney",    tz: "Australia/Sydney",     lat: -33.8688, lon: 151.2093 },
+  { label: "You",      tz: "local",            lat: 40.7128, lon: -74.0060 },
+  { label: "New York", tz: "America/New_York", lat: 40.7128, lon: -74.0060 },
+  { label: "London",   tz: "Europe/London",    lat: 51.5074, lon: -0.1278  },
+  { label: "Tokyo",    tz: "Asia/Tokyo",       lat: 35.6762, lon: 139.6503 },
 ];

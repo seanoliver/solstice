@@ -2,7 +2,13 @@
   "manifest_version": 3,
   "name": "Solstice",
   "version": "1.0.0",
-  "description": "A readable simultaneous view of my timezones.",
+  "description": "A calm new tab that shows your timezones at a glance, with day and night at each.",
+  "icons": {
+    "16": "assets/icons/icon-16.png",
+    "32": "assets/icons/icon-32.png",
+    "48": "assets/icons/icon-48.png",
+    "128": "assets/icons/icon-128.png"
+  },
   "permissions": ["geolocation"],
   "host_permissions": [
     "https://api.bigdatacloud.net/*",

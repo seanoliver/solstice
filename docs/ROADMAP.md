@@ -55,7 +55,9 @@ menu, roughly prioritized. Contributions welcome.
 
 ## Publish to Chrome Web Store — checklist
 
-- [ ] Icons: 16 / 32 / 48 / 128 px (`icons` in `manifest.json` + `action`).
+- [x] Icons: 16 / 32 / 48 / 128 px in `assets/icons/`, wired via `icons` in
+      `manifest.json`. (No `action` — pure new-tab override, a toolbar
+      button would do nothing.)
 - [ ] Store listing: name, short + long description, category, 1280×800
       screenshots, small promo tile.
 - [ ] **Privacy policy** page/URL. The extension uses `geolocation` and

@@ -119,6 +119,11 @@ node --test
 - `test/` — `node:test` unit suites.
 - `docs/plans/` — implementation plan.
 
+## Privacy
+
+No servers, accounts, analytics, or tracking. Location is used only to
+label your local card and is cached locally. See [PRIVACY.md](PRIVACY.md).
+
 ## License
 
 [MIT](LICENSE) © Sean Oliver

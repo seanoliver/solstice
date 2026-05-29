@@ -60,11 +60,8 @@ menu, roughly prioritized. Contributions welcome.
       button would do nothing.)
 - [ ] Store listing: name, short + long description, category, 1280×800
       screenshots, small promo tile.
-- [ ] **Privacy policy** page/URL. The extension uses `geolocation` and
-      calls BigDataCloud + IP providers — Web Store review requires
-      disclosure of what's collected (nothing is stored remotely; location
-      is used only to label the local card and cached locally). State that
-      plainly.
+- [x] **Privacy policy** — `PRIVACY.md` in repo. Once on GitHub, use the
+      raw/blob URL as the policy link in the Web Store listing.
 - [ ] First-run UX: consider a one-time "add your cities" prompt and a
       heads-up before the location permission prompt. (Neutral default
       zone set already shipped.)

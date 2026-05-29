@@ -118,3 +118,7 @@ node --test
   with offline fallback), and `render.js` (single-page renderer + edit bar).
 - `test/` — `node:test` unit suites.
 - `docs/plans/` — implementation plan.
+
+## License
+
+[MIT](LICENSE) © Sean Oliver

@@ -63,13 +63,15 @@ menu, roughly prioritized. Contributions welcome.
       disclosure of what's collected (nothing is stored remotely; location
       is used only to label the local card and cached locally). State that
       plainly.
-- [ ] First-run UX: ship a neutral default zone set (not a personal list);
-      consider a one-time "add your cities" prompt and a heads-up before
-      the location permission prompt.
+- [ ] First-run UX: consider a one-time "add your cities" prompt and a
+      heads-up before the location permission prompt. (Neutral default
+      zone set already shipped.)
 - [ ] Manifest hygiene: bump `version`, add `homepage_url`, author.
-- [ ] Repo: `LICENSE` (MIT is typical for this), `README` install-from-
-      source section, `CONTRIBUTING` note, screenshot in README.
-- [ ] Remove anything personal from default `config.js`.
+- [x] `LICENSE` — MIT.
+- [ ] Repo: `README` install-from-source section, `CONTRIBUTING` note,
+      screenshot in README.
+- [x] Remove anything personal from default `config.js` — neutral set
+      (Local + New York + London + Tokyo).
 
 ## Non-goals (for now)
 

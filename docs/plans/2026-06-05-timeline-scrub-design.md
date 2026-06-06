@@ -52,7 +52,9 @@ Approaches considered:
 ```js
 // base: the day anchor (current scrubAt or now). tz: dragged zone. pct: 0..1.
 export function scrubToInstant(base, tz, pct) {
-  const m = Math.min(1439, Math.round((pct * 1440) / 15) * 15); // snap 15min
+  const clamped = Math.min(1, Math.max(0, pct));
+  // 1425 = 23:45, the last snap slot — never round up into the next day.
+  const m = Math.min(1425, Math.round((clamped * 1440) / 15) * 15);
   const mCur = minutesInZone(base, tz);
   let t = base.getTime() + (m - mCur) * 60000;
   // One correction pass for DST / half-hour offset zones:

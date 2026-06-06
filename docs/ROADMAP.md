@@ -60,14 +60,16 @@ menu, roughly prioritized. Contributions welcome.
 - [x] Icons: 16 / 32 / 48 / 128 px in `assets/icons/`, wired via `icons` in
       `manifest.json`. (No `action` — pure new-tab override, a toolbar
       button would do nothing.)
-- [ ] Store listing: name, short + long description, category, 1280×800
-      screenshots, small promo tile.
+- [~] Store listing: copy (name, summary, detailed description, category),
+      three 1280×800 screenshots, and a 440×280 promo tile are all prepared —
+      copy in `docs/chrome-web-store-listing.md`, assets in `assets/store/`.
+      Only the dashboard submission itself remains (needs the dev account).
 - [x] **Privacy policy** — `PRIVACY.md` in repo. Once on GitHub, use the
       raw/blob URL as the policy link in the Web Store listing.
-- [ ] First-run UX: consider a one-time "add your cities" prompt and a
-      heads-up before the location permission prompt. (Neutral default
-      zone set already shipped.)
-- [ ] Manifest hygiene: bump `version`, add `homepage_url`, author.
+- [—] First-run UX: deferred to post-launch (2026-06-06). Neutral default
+      zone set covers the cold start; revisit only if real users get stuck.
+- [x] Manifest hygiene: added `homepage_url` + `author` (2026-06-06).
+      `version` stays `1.0.0` for the first publish.
 - [x] `LICENSE` — MIT.
 - [x] `README`: public-facing rewrite, icon + 2 screenshots, install-from-
       source, contributions pointer to ROADMAP. (Standalone `CONTRIBUTING.md`

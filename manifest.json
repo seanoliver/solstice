@@ -3,6 +3,8 @@
   "name": "Solstice",
   "version": "1.0.0",
   "description": "A calm new tab that shows your timezones at a glance, with day and night at each.",
+  "author": "Sean Oliver",
+  "homepage_url": "https://github.com/seanoliver/solstice",
   "icons": {
     "16": "assets/icons/icon-16.png",
     "32": "assets/icons/icon-32.png",

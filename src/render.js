@@ -384,6 +384,63 @@ function attachDrag(listEl, ctx) {
   listEl.addEventListener("pointercancel", finish);
 }
 
+function attachScrub(timelineEl, ctx) {
+  let state = null;
+  const pctFromEvent = (strip, clientX) => {
+    const rect = strip.getBoundingClientRect();
+    return (clientX - rect.left) / rect.width; // onScrub clamps
+  };
+
+  timelineEl.addEventListener("pointerdown", (e) => {
+    if (state) return;
+    if (ctx.editMode) return; // edit mode owns the timeline; no scrubbing
+    const strip = e.target.closest(".strip");
+    if (!strip) return;
+    const rows = Array.from(timelineEl.querySelectorAll(".tlrow"));
+    const row = strip.closest(".tlrow");
+    const idx = rows.indexOf(row);
+    if (idx < 0) return;
+    e.preventDefault();
+    strip.setPointerCapture(e.pointerId);
+    state = { pointerId: e.pointerId, strip, idx };
+    ctx.onScrub(idx, pctFromEvent(strip, e.clientX));
+  });
+
+  timelineEl.addEventListener("pointermove", (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    ctx.onScrub(state.idx, pctFromEvent(state.strip, e.clientX));
+  });
+
+  const finish = (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    state = null; // freeze: scrubAt already holds the last instant
+  };
+  timelineEl.addEventListener("pointerup", finish);
+  timelineEl.addEventListener("pointercancel", finish);
+}
+
+// Scrubbed-state pill: the "⏸ 3:00 PM" indicator that doubles as the
+// reset-to-now button. Built by renderLive (full render) and by updateLive
+// (created in place mid-drag, so the timeline isn't torn down under the
+// pointer). scrubPillText is shared so both paths format identically.
+function scrubPillText(local, mode) {
+  const pt = formatHM(local.hour, local.minute, mode);
+  const off = local.dayOffset
+    ? ` ${local.dayOffset > 0 ? "+" : "−"}${Math.abs(local.dayOffset)}` : "";
+  return `⏸ ${pt.hm}${pt.ap ? " " + pt.ap : ""}${off}`;
+}
+
+function scrubPillEl(local, mode, ctx) {
+  const pill = document.createElement("button");
+  pill.className = "scrub-pill";
+  pill.title = "Return to live time (Esc)";
+  pill.innerHTML =
+    `<span class="sp-time">${scrubPillText(local, mode)}</span>` +
+    `<span class="sp-reset">Now</span>`;
+  pill.addEventListener("click", () => ctx.onResetScrub());
+  return pill;
+}
+
 export function renderLive(model, liveEl, now, ctx) {
   const mode = timeMode(ctx);
   const local = model.find((r) => r.tz === "local") || model[0];
@@ -392,6 +449,7 @@ export function renderLive(model, liveEl, now, ctx) {
 
   liveEl.innerHTML = "";
   liveEl.className = "live wt";
+  if (ctx && ctx.scrubAt) liveEl.className += " scrubbed";
 
   // Refs to the time-derived nodes so the 1Hz tick can patch them in place
   // (see updateLive) instead of rebuilding the whole subtree every second.
@@ -399,6 +457,7 @@ export function renderLive(model, liveEl, now, ctx) {
   const refs = {
     mode, solo: soloZone, today: null, clockBig: null,
     soloMeta: null, soloDate: null, soloStrip: null, cards: [], rows: [],
+    topRight: null, scrubPill: null,
   };
 
   const top = document.createElement("header");
@@ -425,6 +484,11 @@ export function renderLive(model, liveEl, now, ctx) {
     fmt.appendChild(b);
   }
   right.append(today, fmt);
+  refs.topRight = right;
+  if (ctx && ctx.scrubAt) {
+    refs.scrubPill = scrubPillEl(local, mode, ctx);
+    right.append(refs.scrubPill);
+  }
   top.append(brand, right);
   liveEl.appendChild(top);
 
@@ -537,6 +601,7 @@ export function renderLive(model, liveEl, now, ctx) {
       refs.rows.push({ strip, time, chip });
       tl.appendChild(row);
     }
+    attachScrub(tl, ctx);
     liveEl.appendChild(tl);
   }
 
@@ -571,6 +636,25 @@ export function updateLive(model, liveEl, now, ctx) {
   const ss = String(now.getSeconds()).padStart(2, "0");
   refs.clockBig.innerHTML = clockInner(t, ss);
   refs.today.textContent = fullDate(now);
+
+  // Scrub chrome, patched in place: toggle the dimmed-future class and
+  // create / update / remove the pill without a full render, so an in-progress
+  // drag (which repaints via this path) never tears down the timeline under
+  // the pointer.
+  const scrubbed = !!(ctx && ctx.scrubAt);
+  liveEl.classList.toggle("scrubbed", scrubbed);
+  if (refs.topRight) {
+    if (scrubbed && !refs.scrubPill) {
+      refs.scrubPill = scrubPillEl(local, mode, ctx);
+      refs.topRight.append(refs.scrubPill);
+    } else if (scrubbed) {
+      refs.scrubPill.querySelector(".sp-time").textContent =
+        scrubPillText(local, mode);
+    } else if (refs.scrubPill) {
+      refs.scrubPill.remove();
+      refs.scrubPill = null;
+    }
+  }
 
   if (soloZone) {
     refs.soloMeta.textContent = `${local.label} · ${local.tzAbbrev}`;

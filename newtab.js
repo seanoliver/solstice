@@ -1,4 +1,4 @@
-import { buildModel } from "./src/timeModel.js";
+import { buildModel, scrubToInstant } from "./src/timeModel.js";
 import { renderLive, updateLive, renderEditBar } from "./src/render.js";
 import {
   loadZones, saveZones, addZone, removeZone, renameZone, reorderZones,
@@ -44,11 +44,13 @@ let focusSearch = false;
 // Cascade: manual home > geolocation > IP > (null → buildModel uses tz city)
 let localLabel = resolveLocalLabel(store, null);
 let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
+let scrubAt = null; // null = live; a Date = frozen at that instant
 
 function ctx() {
   return {
     editMode, query, cities: CITIES, focusSearch, zones,
     localLabel,
+    scrubAt,
     home: readHome(store) || "",
     timeMode: timeFmt,
     onTimeMode(m) {
@@ -95,6 +97,18 @@ function ctx() {
       saveZones(zones, store);
       paintBar(); paintLive();
     },
+    onScrub(zoneIdx, pct) {
+      const z = zones[zoneIdx];
+      if (!z) return;
+      const base = scrubAt ?? new Date();
+      scrubAt = scrubToInstant(base, z.tz, pct);
+      paintScrub();
+    },
+    onResetScrub() {
+      if (scrubAt === null) return;
+      scrubAt = null;
+      paintLive();
+    },
   };
 }
 
@@ -104,15 +118,25 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 // resize. Wiping the subtree momentarily collapses page height, so preserve
 // scroll position across the swap.
 function paintLive() {
-  const now = new Date();
+  const now = scrubAt ?? new Date();
   const y = window.scrollY;
   renderLive(buildModel(zones, now, localLabel), live, now, ctx());
   if (window.scrollY !== y) window.scrollTo(0, y);
 }
 
+// In-place repaint for scrubbing. Patches nodes via updateLive instead of a
+// full rebuild, so the timeline strip under the drag pointer — and its pointer
+// capture — survive each move. A full paintLive() here would tear down the
+// captured element and kill the drag after the first event.
+function paintScrub() {
+  const now = scrubAt ?? new Date();
+  updateLive(buildModel(zones, now, localLabel), live, now, ctx());
+}
+
 // 1Hz update: patch only the time-derived nodes in place (no teardown, so
 // no height collapse and no scroll juggling).
 function tick() {
+  if (scrubAt) return;
   const now = new Date();
   updateLive(buildModel(zones, now, localLabel), live, now, ctx());
 }
@@ -130,6 +154,9 @@ async function refreshGeo() {
 paintBar();
 paintLive();
 setInterval(tick, 1000);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && scrubAt) { scrubAt = null; paintLive(); }
+});
 if (needsRefresh(store)) refreshGeo();
 
 // Card-grid column count depends on width, so resize needs a full rebuild.

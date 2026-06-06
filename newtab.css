@@ -202,3 +202,18 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .gh-link:hover { opacity:.85; color:var(--txt); }
 .gh-link svg { width:14px; height:14px; fill:currentColor; }
 @media (max-width: 600px) { .gh-link span { display:none; } }
+
+/* --- timeline scrub --- */
+.scrub-pill { display:inline-flex; align-items:center; gap:.5rem;
+  font:12px/1 "JetBrains Mono",ui-monospace,Menlo,monospace;
+  cursor:pointer; padding:.4rem .7rem; border-radius:999px;
+  border:1px solid var(--accent); color:var(--accent);
+  background:rgba(45,212,191,.12); letter-spacing:.04em; }
+.scrub-pill:hover { background:rgba(45,212,191,.2); }
+.scrub-pill .sp-reset { color:var(--muted); border-left:1px solid var(--border);
+  padding-left:.5rem; text-transform:uppercase; letter-spacing:.1em; font-size:.85em; }
+.scrub-pill:hover .sp-reset { color:var(--accent); }
+/* Pinned instant → "what hasn't happened yet" is meaningless. */
+.live.scrubbed .strip .future { display:none; }
+/* Only the 24h timeline strips are draggable. */
+.timeline .strip { cursor:ew-resize; touch-action:none; }

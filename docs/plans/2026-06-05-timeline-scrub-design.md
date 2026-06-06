@@ -89,7 +89,8 @@ zone on a DST-transition day.
 - `.live.scrubbed` class on the live root → CSS hides the `.future` dim
   overlay on every strip (meaningless once an arbitrary instant is pinned)
   and may accent markers.
-- Big clock shows the frozen time with static seconds.
+- Big clock shows the frozen time with the seconds counter hidden — a pinned
+  instant has no ticking seconds (`.live.scrubbed .big .secs { display:none }`).
 
 ## Scope decisions (flagged, can override)
 

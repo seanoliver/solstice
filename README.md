@@ -28,6 +28,8 @@ No accounts, no feeds, no clutter. Open a tab, get your bearings, move on.
   coordinates, so the colored bands reflect the actual day — not a guess.
 - **Yours in seconds.** Add or remove cities, drag to reorder, rename a zone
   to a person's name, flip the whole page between 12h and 24h.
+- **Plan across zones.** Drag any timeline marker and every clock jumps to
+  that moment — so you can find an hour that's civil for everyone.
 - **Quiet by design.** Muted palette, monospace numerals, nothing blinking
   for your attention.
 
@@ -66,6 +68,20 @@ automatically. Don't like the guess? Type your own home label and it sticks.
 
 A **12h / 24h** toggle in the top-right switches every time on the page at
 once. Everything you change persists locally between tabs.
+
+## Scrub to any moment
+
+<p align="center">
+  <img src="assets/screenshots/scrub.png" width="820" alt="Solstice scrubbed to noon — the big clock, every card, and every timeline frozen at the same instant, with a pause pill in the top-right showing the scrubbed time" />
+</p>
+
+Planning a call? Grab the marker on any timeline row and drag. The big local
+clock, every card, and every other timeline jump to the same instant — so you
+can read straight across: noon in San Francisco is 3pm in New York, 8pm in
+London, tomorrow morning in Tokyo. Times snap to the quarter-hour as you go.
+
+The page freezes while you explore, with a **⏸** pill up top showing the
+moment you're parked at. Click it — or press **Esc** — to drop back to now.
 
 ## Install
 

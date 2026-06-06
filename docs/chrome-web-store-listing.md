@@ -21,7 +21,7 @@ Contains only runtime files + icons — no docs, tests, screenshots, or README.
 
 - **Name:** `Solstice`
 - **Summary** (short description, ≤132 chars):
-  `A calm new tab with your time zones at a glance — day & night shading on each, plus a 24-hour timeline you can scrub.`
+  `A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.`
 - **Category:** Workflow & Planning _(alternate: Tools)_
 - **Language:** English
 

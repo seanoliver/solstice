@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { zoneNow, buildModel, ymdNumber, cityFromTz, formatHM } from "../src/timeModel.js";
+import { zoneNow, buildModel, ymdNumber, cityFromTz, formatHM, minutesInZone, scrubToInstant } from "../src/timeModel.js";
 
 test("formatHM 12-hour", () => {
   assert.deepEqual(formatHM(0, 5, "12"), { hm: "12:05", ap: "AM" });
@@ -80,4 +80,36 @@ test("buildModel row has the full shape", () => {
   assert.match(row.dateLabel, /\w{3},\s\w{3}\s\d/); // e.g. "Mon, May 18"
   assert.equal(typeof row.tzAbbrev, "string");
   assert.ok(row.tzAbbrev.length > 0);
+});
+
+test("scrubToInstant snaps to the nearest 15 minutes in the dragged zone", () => {
+  const base = new Date("2026-06-05T12:00:00Z");
+  const tz = "UTC";
+  const t = scrubToInstant(base, tz, 0.5);
+  assert.equal(minutesInZone(t, tz), 12 * 60); // 720 min = 12:00
+
+  const t2 = scrubToInstant(base, tz, (3 * 60 + 7) / 1440);
+  assert.equal(minutesInZone(t2, tz), 3 * 60);
+
+  const t3 = scrubToInstant(base, tz, (3 * 60 + 8) / 1440);
+  assert.equal(minutesInZone(t3, tz), 3 * 60 + 15);
+});
+
+test("scrubToInstant is exact for a half-hour-offset zone", () => {
+  const base = new Date("2026-06-05T06:00:00Z");
+  const tz = "Asia/Kolkata"; // UTC+5:30
+  const t = scrubToInstant(base, tz, (9 * 60 + 30) / 1440); // target 09:30 IST
+  assert.equal(minutesInZone(t, tz), 9 * 60 + 30);
+});
+
+test("scrubToInstant lands on the target across a DST transition day", () => {
+  const base = new Date("2026-03-08T20:00:00Z"); // US DST began 2026-03-08
+  const tz = "America/Los_Angeles";
+  const t = scrubToInstant(base, tz, (9 * 60) / 1440);
+  assert.equal(minutesInZone(t, tz), 9 * 60);
+});
+
+test("scrubToInstant clamps pct to the last quarter (23:45)", () => {
+  const base = new Date("2026-06-05T00:00:00Z");
+  assert.equal(minutesInZone(scrubToInstant(base, "UTC", 1), "UTC"), 23 * 60 + 45);
 });

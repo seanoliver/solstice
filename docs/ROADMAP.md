@@ -16,8 +16,10 @@ menu, roughly prioritized. Contributions welcome.
 
 - **Meeting / overlap finder** — common working-hours across selected zones.
 - ~~**Drag-to-reorder zones** in edit mode (persist order in `localStorage`).~~ Shipped 2026-05-20.
-- **Timeline scrub** — drag a playhead to ask "when it's 3pm here, what
-  time is it everywhere?" Pairs naturally with the existing timeline.
+- ~~**Timeline scrub** — drag a playhead to ask "when it's 3pm here, what
+  time is it everywhere?"~~ Shipped 2026-06-05: drag any 24h timeline marker
+  to freeze the whole UI at that instant (snaps to 15 min); "Now" pill + Esc
+  return to live. Design + plan in `docs/plans/2026-06-05-timeline-scrub*.md`.
 - **Per-zone work hours** — override the fixed 9–5 per zone (some people
   want 8–4, split shifts, etc.). Currently hardcoded in `dayPart.js`.
 - **Click a card to copy** a formatted string ("3:02 PM SF / 11:02 PM

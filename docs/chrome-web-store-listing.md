@@ -22,7 +22,9 @@ Contains only runtime files + icons — no docs, tests, screenshots, or README.
 - **Name:** `Solstice`
 - **Summary** (short description, ≤132 chars):
   `A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.`
-- **Category:** Workflow & Planning _(alternate: Tools)_
+- **Category:** Functionality & UI _(alternate: Workflow & Planning)_ — new-tab
+  overrides cluster here, which helps the "similar extensions" rail surface
+  Solstice alongside peers. Reversible post-launch.
 - **Language:** English
 
 ### Detailed description

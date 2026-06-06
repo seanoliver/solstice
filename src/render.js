@@ -384,6 +384,40 @@ function attachDrag(listEl, ctx) {
   listEl.addEventListener("pointercancel", finish);
 }
 
+function attachScrub(timelineEl, ctx) {
+  let state = null;
+  const pctFromEvent = (strip, clientX) => {
+    const rect = strip.getBoundingClientRect();
+    return (clientX - rect.left) / rect.width; // onScrub clamps
+  };
+
+  timelineEl.addEventListener("pointerdown", (e) => {
+    if (state) return;
+    const strip = e.target.closest(".strip");
+    if (!strip) return;
+    const rows = Array.from(timelineEl.querySelectorAll(".tlrow"));
+    const row = strip.closest(".tlrow");
+    const idx = rows.indexOf(row);
+    if (idx < 0) return;
+    e.preventDefault();
+    strip.setPointerCapture(e.pointerId);
+    state = { pointerId: e.pointerId, strip, idx };
+    ctx.onScrub(idx, pctFromEvent(strip, e.clientX));
+  });
+
+  timelineEl.addEventListener("pointermove", (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    ctx.onScrub(state.idx, pctFromEvent(state.strip, e.clientX));
+  });
+
+  const finish = (e) => {
+    if (!state || e.pointerId !== state.pointerId) return;
+    state = null; // freeze: scrubAt already holds the last instant
+  };
+  timelineEl.addEventListener("pointerup", finish);
+  timelineEl.addEventListener("pointercancel", finish);
+}
+
 export function renderLive(model, liveEl, now, ctx) {
   const mode = timeMode(ctx);
   const local = model.find((r) => r.tz === "local") || model[0];
@@ -392,6 +426,7 @@ export function renderLive(model, liveEl, now, ctx) {
 
   liveEl.innerHTML = "";
   liveEl.className = "live wt";
+  if (ctx && ctx.scrubAt) liveEl.className += " scrubbed";
 
   // Refs to the time-derived nodes so the 1Hz tick can patch them in place
   // (see updateLive) instead of rebuilding the whole subtree every second.
@@ -425,6 +460,19 @@ export function renderLive(model, liveEl, now, ctx) {
     fmt.appendChild(b);
   }
   right.append(today, fmt);
+  if (ctx && ctx.scrubAt) {
+    const pt = formatHM(local.hour, local.minute, mode);
+    const pill = document.createElement("button");
+    pill.className = "scrub-pill";
+    pill.title = "Return to live time (Esc)";
+    const off = local.dayOffset
+      ? ` ${local.dayOffset > 0 ? "+" : "−"}${Math.abs(local.dayOffset)}` : "";
+    pill.innerHTML =
+      `<span class="sp-time">⏸ ${pt.hm}${pt.ap ? " " + pt.ap : ""}${off}</span>` +
+      `<span class="sp-reset">Now</span>`;
+    pill.addEventListener("click", () => ctx.onResetScrub());
+    right.append(pill);
+  }
   top.append(brand, right);
   liveEl.appendChild(top);
 
@@ -537,6 +585,7 @@ export function renderLive(model, liveEl, now, ctx) {
       refs.rows.push({ strip, time, chip });
       tl.appendChild(row);
     }
+    attachScrub(tl, ctx);
     liveEl.appendChild(tl);
   }
 

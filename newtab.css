@@ -215,5 +215,7 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .scrub-pill:hover .sp-reset { color:var(--accent); }
 /* Pinned instant → "what hasn't happened yet" is meaningless. */
 .live.scrubbed .strip .future { display:none; }
+/* A frozen instant has no ticking seconds — hide the counter while scrubbed. */
+.live.scrubbed .big .secs { display:none; }
 /* Only the 24h timeline strips are draggable. */
 .timeline .strip { cursor:ew-resize; touch-action:none; }

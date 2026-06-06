@@ -102,7 +102,7 @@ function ctx() {
       if (!z) return;
       const base = scrubAt ?? new Date();
       scrubAt = scrubToInstant(base, z.tz, pct);
-      paintLive();
+      paintScrub();
     },
     onResetScrub() {
       if (scrubAt === null) return;
@@ -122,6 +122,15 @@ function paintLive() {
   const y = window.scrollY;
   renderLive(buildModel(zones, now, localLabel), live, now, ctx());
   if (window.scrollY !== y) window.scrollTo(0, y);
+}
+
+// In-place repaint for scrubbing. Patches nodes via updateLive instead of a
+// full rebuild, so the timeline strip under the drag pointer — and its pointer
+// capture — survive each move. A full paintLive() here would tear down the
+// captured element and kill the drag after the first event.
+function paintScrub() {
+  const now = scrubAt ?? new Date();
+  updateLive(buildModel(zones, now, localLabel), live, now, ctx());
 }
 
 // 1Hz update: patch only the time-derived nodes in place (no teardown, so

@@ -393,6 +393,7 @@ function attachScrub(timelineEl, ctx) {
 
   timelineEl.addEventListener("pointerdown", (e) => {
     if (state) return;
+    if (ctx.editMode) return; // edit mode owns the timeline; no scrubbing
     const strip = e.target.closest(".strip");
     if (!strip) return;
     const rows = Array.from(timelineEl.querySelectorAll(".tlrow"));
@@ -418,6 +419,28 @@ function attachScrub(timelineEl, ctx) {
   timelineEl.addEventListener("pointercancel", finish);
 }
 
+// Scrubbed-state pill: the "⏸ 3:00 PM" indicator that doubles as the
+// reset-to-now button. Built by renderLive (full render) and by updateLive
+// (created in place mid-drag, so the timeline isn't torn down under the
+// pointer). scrubPillText is shared so both paths format identically.
+function scrubPillText(local, mode) {
+  const pt = formatHM(local.hour, local.minute, mode);
+  const off = local.dayOffset
+    ? ` ${local.dayOffset > 0 ? "+" : "−"}${Math.abs(local.dayOffset)}` : "";
+  return `⏸ ${pt.hm}${pt.ap ? " " + pt.ap : ""}${off}`;
+}
+
+function scrubPillEl(local, mode, ctx) {
+  const pill = document.createElement("button");
+  pill.className = "scrub-pill";
+  pill.title = "Return to live time (Esc)";
+  pill.innerHTML =
+    `<span class="sp-time">${scrubPillText(local, mode)}</span>` +
+    `<span class="sp-reset">Now</span>`;
+  pill.addEventListener("click", () => ctx.onResetScrub());
+  return pill;
+}
+
 export function renderLive(model, liveEl, now, ctx) {
   const mode = timeMode(ctx);
   const local = model.find((r) => r.tz === "local") || model[0];
@@ -434,6 +457,7 @@ export function renderLive(model, liveEl, now, ctx) {
   const refs = {
     mode, solo: soloZone, today: null, clockBig: null,
     soloMeta: null, soloDate: null, soloStrip: null, cards: [], rows: [],
+    topRight: null, scrubPill: null,
   };
 
   const top = document.createElement("header");
@@ -460,18 +484,10 @@ export function renderLive(model, liveEl, now, ctx) {
     fmt.appendChild(b);
   }
   right.append(today, fmt);
+  refs.topRight = right;
   if (ctx && ctx.scrubAt) {
-    const pt = formatHM(local.hour, local.minute, mode);
-    const pill = document.createElement("button");
-    pill.className = "scrub-pill";
-    pill.title = "Return to live time (Esc)";
-    const off = local.dayOffset
-      ? ` ${local.dayOffset > 0 ? "+" : "−"}${Math.abs(local.dayOffset)}` : "";
-    pill.innerHTML =
-      `<span class="sp-time">⏸ ${pt.hm}${pt.ap ? " " + pt.ap : ""}${off}</span>` +
-      `<span class="sp-reset">Now</span>`;
-    pill.addEventListener("click", () => ctx.onResetScrub());
-    right.append(pill);
+    refs.scrubPill = scrubPillEl(local, mode, ctx);
+    right.append(refs.scrubPill);
   }
   top.append(brand, right);
   liveEl.appendChild(top);
@@ -620,6 +636,25 @@ export function updateLive(model, liveEl, now, ctx) {
   const ss = String(now.getSeconds()).padStart(2, "0");
   refs.clockBig.innerHTML = clockInner(t, ss);
   refs.today.textContent = fullDate(now);
+
+  // Scrub chrome, patched in place: toggle the dimmed-future class and
+  // create / update / remove the pill without a full render, so an in-progress
+  // drag (which repaints via this path) never tears down the timeline under
+  // the pointer.
+  const scrubbed = !!(ctx && ctx.scrubAt);
+  liveEl.classList.toggle("scrubbed", scrubbed);
+  if (refs.topRight) {
+    if (scrubbed && !refs.scrubPill) {
+      refs.scrubPill = scrubPillEl(local, mode, ctx);
+      refs.topRight.append(refs.scrubPill);
+    } else if (scrubbed) {
+      refs.scrubPill.querySelector(".sp-time").textContent =
+        scrubPillText(local, mode);
+    } else if (refs.scrubPill) {
+      refs.scrubPill.remove();
+      refs.scrubPill = null;
+    }
+  }
 
   if (soloZone) {
     refs.soloMeta.textContent = `${local.label} · ${local.tzAbbrev}`;

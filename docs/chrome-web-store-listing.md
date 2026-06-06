@@ -28,21 +28,21 @@ Contains only runtime files + icons — no docs, tests, screenshots, or README.
 ### Detailed description
 
 ```
-Solstice replaces Chrome's new tab with a single, quiet world clock. A big
-local time up top, a card for every place you care about, and a 24-hour
-timeline that makes the whole day legible at once.
+Solstice turns your new tab into a calm map of time: a big local clock up top,
+a card for every place you care about, and a 24-hour timeline below — all
+shaded so you can see, at a glance, where daylight and working hours fall
+across your zones.
 
-Every clock is shaded by where the sun actually is — sunrise and sunset are
-computed for each city's real coordinates — so you can tell at a glance who's
-asleep, who's mid-morning, and who's wrapping up their day.
+Warm bands are daytime, grey is night, and a teal band marks the 9-to-5 —
+drawn from each city's real sunrise and sunset. So you can tell who's asleep,
+who's mid-morning, and who's already into their evening.
 
-• Glanceable — one screen answers "what time is it for them, and is now a good
-  time to ping?"
-• Day & night, for real — colored bands reflect the actual day, not a guess.
-• Plan across zones — drag any timeline marker and every clock jumps to that
-  moment, so you can find an hour that's civil for everyone.
+• See daylight and working hours at a glance — colored bands trace each city's
+  real day, so the whole timeline reads in a second.
+• Scrub to any moment — drag any timeline marker and every clock jumps to that
+  instant, so you can find an hour that's civil for the whole group.
 • Yours in seconds — add or remove cities, drag to reorder, rename a zone to a
-  person's name, flip the whole page between 12h and 24h.
+  person's name, flip the page between 12h and 24h.
 • Quiet by design — muted palette, monospace numerals, nothing blinking for
   your attention.
 

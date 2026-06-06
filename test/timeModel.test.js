@@ -113,3 +113,12 @@ test("scrubToInstant clamps pct to the last quarter (23:45)", () => {
   const base = new Date("2026-06-05T00:00:00Z");
   assert.equal(minutesInZone(scrubToInstant(base, "UTC", 1), "UTC"), 23 * 60 + 45);
 });
+
+test("scrubToInstant resolves a spring-forward gap time forward (documented behavior)", () => {
+  // 02:00-02:59 local does not exist on 2026-03-08 in LA (spring forward).
+  // Dragging to 02:15 deterministically lands on 03:15 — the lost hour is added.
+  const base = new Date("2026-03-08T20:00:00Z");
+  const tz = "America/Los_Angeles";
+  const t = scrubToInstant(base, tz, (2 * 60 + 15) / 1440);
+  assert.equal(minutesInZone(t, tz), 3 * 60 + 15); // 195 min = 03:15
+});

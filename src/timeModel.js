@@ -100,7 +100,10 @@ export function buildModel(zones, at = new Date(), localLabel = null) {
 // Map a dragged timeline position (pct 0..1) to the absolute instant at which
 // `tz` reads that time-of-day, snapped to the nearest 15 minutes. `base` is the
 // day anchor (current scrub instant or now); the dragged zone stays on `base`'s
-// calendar day. A single correction pass absorbs DST / half-hour offsets.
+// calendar day. A single correction pass resolves DST offset changes and
+// half-hour / 45-min zones exactly. A target inside a spring-forward gap (a
+// non-existent local time) resolves deterministically to the post-transition
+// instant — the lost hour is added (e.g. 02:15 → 03:15).
 export function scrubToInstant(base, tz, pct) {
   const clamped = Math.min(1, Math.max(0, pct));
   const m = Math.min(1425, Math.round((clamped * 1440) / 15) * 15); // ≤ 23:45

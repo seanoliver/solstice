@@ -20,7 +20,9 @@ Contains only runtime files + icons — no docs, tests, screenshots, or README.
 ## Listing fields
 
 - **Name:** `Solstice`
-- **Summary** (short description, ≤132 chars):
+- **Summary** (short description, ≤132 chars) — NOT editable in the dashboard;
+  it is read from `manifest.json`'s `description`, so changing it means a new
+  package upload:
   `A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.`
 - **Category:** Functionality & UI _(alternate: Workflow & Planning)_ — new-tab
   overrides cluster here, which helps the "similar extensions" rail surface
@@ -59,7 +61,8 @@ browser. Open a tab, get your bearings, move on.
   - `assets/store/store-hero.png` — the default view.
   - `assets/store/store-scrub.png` — scrubbed to noon (the timeline-scrub feature).
   - `assets/store/store-edit.png` — edit panel + add-a-city search.
-- **Small promo tile** (440×280, optional): `assets/store/store-promo.png`.
+- **Small promo tile** (440×280, optional): `assets/store/store-promo.jpg`
+  (JPEG — the dashboard rejects PNGs with an alpha channel).
   Minimal icon-on-dark tile; only needed if Chrome features the extension.
 
 ## Privacy tab (required before submission)

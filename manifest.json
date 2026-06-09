@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Solstice",
   "version": "1.0.0",
-  "description": "A calm new tab that shows your timezones at a glance, with day and night at each.",
+  "description": "A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.",
   "author": "Sean Oliver",
   "homepage_url": "https://github.com/seanoliver/solstice",
   "icons": {

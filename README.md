@@ -9,6 +9,10 @@
 </p>
 
 <p align="center">
+  <a href="https://chromewebstore.google.com/detail/solstice/boegcpnmpagdbebakchpambpfggghjhe"><strong>Install from the Chrome Web Store</strong></a>
+</p>
+
+<p align="center">
   <img src="assets/screenshots/hero.png" width="820" alt="Solstice new tab — a big local clock above a row of timezone cards and a 24-hour timeline" />
 </p>
 
@@ -85,7 +89,9 @@ moment you're parked at. Click it — or press **Esc** — to drop back to now.
 
 ## Install
 
-Until it's on the Chrome Web Store, load it unpacked:
+**[Add Solstice from the Chrome Web Store](https://chromewebstore.google.com/detail/solstice/boegcpnmpagdbebakchpambpfggghjhe)** — then open a new tab.
+
+Or load it unpacked for development:
 
 1. Clone or download this repo.
 2. Open `chrome://extensions` and enable **Developer mode** (top right).

@@ -74,4 +74,5 @@ or browsing history, because it has none.
 
 ## Contact
 
-Questions or concerns: open an issue on the project's GitHub repository.
+Questions or concerns: email [solstice@seanoliver.dev](mailto:solstice@seanoliver.dev)
+or open an issue on the project's GitHub repository.

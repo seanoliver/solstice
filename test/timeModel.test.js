@@ -22,6 +22,40 @@ test("buildModel uses the localLabel override for the local zone", () => {
   assert.equal(row.label, "San Francisco");
 });
 
+// The seed local zone ships with NYC coords; detected coords must win so a
+// user elsewhere doesn't see NYC's sun bands (docs/bugs, 2026-07-08).
+test("buildModel localCoords override drives the local zone's sun times", () => {
+  const at = new Date("2026-07-08T23:28:00Z");
+  const sf = { lat: 37.7749, lon: -122.4194 };
+  const nycLocal = [{ label: "You", tz: "local", lat: 40.7128, lon: -74.0060 }];
+  const sfLocal = [{ label: "You", tz: "local", lat: sf.lat, lon: sf.lon }];
+  const overridden = buildModel(nycLocal, at, null, sf)[0];
+  const control = buildModel(sfLocal, at)[0];
+  assert.equal(overridden.sunriseMin, control.sunriseMin);
+  assert.equal(overridden.sunsetMin, control.sunsetMin);
+  // Without the override the seed coords still apply (and differ from SF).
+  const fallback = buildModel(nycLocal, at)[0];
+  assert.notEqual(fallback.sunsetMin, control.sunsetMin);
+});
+
+test("buildModel localCoords does not touch non-local zones", () => {
+  const at = new Date("2026-07-08T23:28:00Z");
+  const zones = [{ label: "NY", tz: "America/New_York", lat: 40.7128, lon: -74.0060 }];
+  const withOverride = buildModel(zones, at, null, { lat: 37.7749, lon: -122.4194 })[0];
+  const without = buildModel(zones, at)[0];
+  assert.equal(withOverride.sunriseMin, without.sunriseMin);
+  assert.equal(withOverride.sunsetMin, without.sunsetMin);
+});
+
+test("buildModel ignores malformed localCoords", () => {
+  const at = new Date("2026-07-08T23:28:00Z");
+  const zones = [{ label: "You", tz: "local", lat: 40.7128, lon: -74.0060 }];
+  const bad = buildModel(zones, at, null, { lat: NaN, lon: -122.4194 })[0];
+  const fallback = buildModel(zones, at)[0];
+  assert.equal(bad.sunriseMin, fallback.sunriseMin);
+  assert.equal(bad.sunsetMin, fallback.sunsetMin);
+});
+
 test("cityFromTz turns an IANA zone into a city label", () => {
   assert.equal(cityFromTz("America/Los_Angeles"), "Los Angeles");
   assert.equal(cityFromTz("Europe/London"), "London");

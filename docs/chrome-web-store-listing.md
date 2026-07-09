@@ -6,11 +6,14 @@ require Sean's developer account and can't be automated.
 
 ## Package
 
-Upload artifact: `solstice-1.0.0.zip` (repo root, git-ignored — rebuild any time):
+Upload artifact: `solstice-<version>.zip` (repo root, git-ignored — rebuild
+any time; the version is read from `manifest.json`, which must be bumped
+before each upload):
 
 ```bash
-rm -f solstice-1.0.0.zip
-zip -rq solstice-1.0.0.zip \
+V=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])")
+rm -f solstice-*.zip
+zip -rq "solstice-$V.zip" \
   manifest.json newtab.html newtab.css newtab.js config.js cities.js \
   src assets/icons -x '*.DS_Store'
 ```

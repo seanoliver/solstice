@@ -4,7 +4,7 @@ import {
   loadZones, saveZones, addZone, removeZone, renameZone, reorderZones,
 } from "./src/zones.js";
 import {
-  resolveLocalLabel, needsRefresh, refreshLocation,
+  resolveLocalLabel, resolveLocalCoords, needsRefresh, refreshLocation,
   readHome, writeHome,
 } from "./src/geo.js";
 import { CITIES } from "./cities.js";
@@ -43,6 +43,8 @@ let query = "";
 let focusSearch = false;
 // Cascade: manual home > geolocation > IP > (null → buildModel uses tz city)
 let localLabel = resolveLocalLabel(store, null);
+// Detected coords for the local card's sun bands (null → seed coords).
+let localCoords = resolveLocalCoords(store);
 let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 let scrubAt = null; // null = live; a Date = frozen at that instant
 
@@ -120,7 +122,7 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 function paintLive() {
   const now = scrubAt ?? new Date();
   const y = window.scrollY;
-  renderLive(buildModel(zones, now, localLabel), live, now, ctx());
+  renderLive(buildModel(zones, now, localLabel, localCoords), live, now, ctx());
   if (window.scrollY !== y) window.scrollTo(0, y);
 }
 
@@ -130,7 +132,7 @@ function paintLive() {
 // captured element and kill the drag after the first event.
 function paintScrub() {
   const now = scrubAt ?? new Date();
-  updateLive(buildModel(zones, now, localLabel), live, now, ctx());
+  updateLive(buildModel(zones, now, localLabel, localCoords), live, now, ctx());
 }
 
 // 1Hz update: patch only the time-derived nodes in place (no teardown, so
@@ -138,7 +140,7 @@ function paintScrub() {
 function tick() {
   if (scrubAt) return;
   const now = new Date();
-  updateLive(buildModel(zones, now, localLabel), live, now, ctx());
+  updateLive(buildModel(zones, now, localLabel, localCoords), live, now, ctx());
 }
 
 // Render immediately with whatever the cascade already knows; upgrade when
@@ -147,6 +149,7 @@ async function refreshGeo() {
   const city = await refreshLocation(store);
   if (city) {
     localLabel = resolveLocalLabel(store, null);
+    localCoords = resolveLocalCoords(store);
     paintLive();
   }
 }

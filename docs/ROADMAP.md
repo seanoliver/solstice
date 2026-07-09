@@ -44,12 +44,14 @@ menu, roughly prioritized. Contributions welcome.
   AM/PM-as-night entry exists; the `letter-spacing` and `hour12`/
   `hourCycle` fixes are worth recording for an OSS repo).
 - **CI** — run `node --test` on PRs.
-- **Local-zone sun bands track geolocation** — currently the geo cascade
+- ~~**Local-zone sun bands track geolocation** — currently the geo cascade
   (`src/geo.js`) only overrides the local card's *label*. Its `lat`/`lon`
   for the sunrise/sunset computation come from `config.js` and never
   update, so a user far from the seed coords sees the wrong sun bands on
   the local card. Should plumb resolved geolocation coords into the local
-  row's `sunTimesUTC` call in `buildModel`.
+  row's `sunTimesUTC` call in `buildModel`.~~ Shipped 2026-07-08: the geo
+  cascade caches detected coords alongside the city and `buildModel` uses
+  them for the local row (`docs/bugs/2026-07-08-local-sun-times-use-seed-coords.md`).
 - ~~**Reduce reflow** — `renderLive` rebuilds the whole DOM every second;
   fine today, but a diff/update path would be tidier if features grow.~~
   Shipped 2026-05-21: the 1Hz tick now patches only time-derived nodes in

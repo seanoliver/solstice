@@ -69,14 +69,23 @@ export function cityFromTz(tz) {
   return seg.replace(/_/g, " ");
 }
 
-export function buildModel(zones, at = new Date(), localLabel = null) {
+// `localCoords` ({lat, lon}, optional) overrides the local zone's seed
+// coords for the sun computation — the persisted local zone keeps the
+// first-install seed, so detected geolocation must be plumbed in per render.
+export function buildModel(zones, at = new Date(), localLabel = null,
+  localCoords = null) {
   const localNum = ymdNumber(at, "local");
   const localCity = localLabel
     || cityFromTz(new Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const coordsOk = localCoords
+    && Number.isFinite(localCoords.lat) && Number.isFinite(localCoords.lon);
   return zones.map((z) => {
     const { hour, minute, label } = zoneNow(z.tz, at);
     const minutesOfDay = hour * 60 + minute;
-    const sun = sunTimesUTC(at, z.lat, z.lon);
+    const useLocal = z.tz === "local" && coordsOk;
+    const sun = sunTimesUTC(at,
+      useLocal ? localCoords.lat : z.lat,
+      useLocal ? localCoords.lon : z.lon);
     let sunriseMin = 0, sunsetMin = 1440;
     if (sun.sunrise && sun.sunset) {
       sunriseMin = minutesInZone(sun.sunrise, z.tz);

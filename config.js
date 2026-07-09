@@ -1,7 +1,8 @@
 // Default zones shown on first install. The local zone's IANA timezone is
 // "local" (resolves to the user's system tz at runtime). Coords are used
-// for offline sunrise/sunset; the geo cascade in src/geo.js may override
-// the *label* with the detected city, but not these coords (see ROADMAP).
+// for offline sunrise/sunset; the geo cascade in src/geo.js overrides the
+// local zone's *label* and *sun coords* with the detected city when
+// available — these seed coords are only the offline/undetected fallback.
 //
 // Users add/remove zones at runtime via Edit mode; this list only seeds
 // the first install.

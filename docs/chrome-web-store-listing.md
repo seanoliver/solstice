@@ -73,18 +73,20 @@ browser. Open a tab, get your bearings, move on.
 - **Single purpose:** "A new-tab page that displays the current time across
   multiple time zones, with sunrise/sunset-based day-night shading."
 - **Permission justifications:**
-  - `geolocation` — Optional. Used only to label the user's local card with a
-    nearby city name. The user is never forced to grant it; the card falls back
-    to the browser's time-zone name. Coordinates are cached locally and sent
-    only to the reverse-geocoding endpoint to resolve a city name.
+  - `geolocation` — Optional. Used to label the user's local card with a
+    nearby city name and calculate accurate sunrise/sunset bands for that
+    location. The user is never forced to grant it; the card falls back to IP
+    location or the browser's time-zone name. The detected city and coordinates
+    are cached locally for 24 hours; coordinates are sent only to the
+    reverse-geocoding endpoint to resolve the city name.
   - Host `api.bigdatacloud.net` — reverse-geocode granted coordinates → city name.
   - Hosts `ipwho.is`, `ipapi.co`, `get.geojs.io` — IP-based city fallback when
     geolocation is denied or unavailable (tried in order).
   - Host `geocoding-api.open-meteo.com` — city search when adding a zone whose
     name isn't in the bundled dataset.
 - **Data usage disclosures:** Does NOT collect or transmit personal or usage
-  data. No analytics, no remote logging. Location (if granted) is used
-  ephemerally to look up a city name and cached locally only.
+  data. No analytics, no remote logging. A detected city and coordinates are
+  cached locally for 24 hours to label the local card and calculate daylight.
 - **Privacy policy URL:** `https://github.com/seanoliver/solstice/blob/main/PRIVACY.md`
 
 ## Submission steps **(you)**

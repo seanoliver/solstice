@@ -1,6 +1,6 @@
 # Privacy Policy
 
-_Last updated: 2026-05-28_
+_Last updated: 2026-08-09_
 
 Solstice is a Chrome new-tab extension that displays a world clock. It has
 **no servers, no accounts, no analytics, no tracking, and no advertising.**
@@ -18,14 +18,16 @@ All of your settings are stored locally in your browser
 - Your list of timezones/cities.
 - Your 12h/24h preference and other view settings.
 - Your manually entered "home" label, if you set one.
-- The most recently detected city name for your local card (cached for 24
-  hours to avoid repeated lookups).
+- The most recently detected city name and coordinates for your local card
+  (cached for 24 hours to avoid repeated lookups and to calculate local
+  sunrise/sunset times).
 
 Uninstalling the extension, or clearing the site data, removes all of it.
 
 ## Location
 
-To label your local card with a city name, the extension tries, in order:
+To label your local card with a city name and calculate its daylight accurately,
+the extension tries, in order:
 
 1. **A "home" label you typed yourself** — fully local, no network, and it
    takes priority over everything below. If you set this, no location
@@ -33,12 +35,15 @@ To label your local card with a city name, the extension tries, in order:
 2. **Your browser's Geolocation** — only if you grant the permission Chrome
    prompts for. Your approximate coordinates are sent **once** to
    BigDataCloud's reverse-geocoding API to turn them into a city name. The
-   coordinates are not stored or sent anywhere else; only the resulting
-   city name is cached locally.
+   city name and coordinates are cached locally for 24 hours so Solstice can
+   calculate accurate sunrise/sunset times without asking again. They are not
+   sent anywhere else.
 3. **Approximate IP-based location** — used only if Geolocation is denied
    or unavailable. The extension requests your city from one of
    ipwho.is, ipapi.co, or get.geojs.io. As with any web request, these
    services can see your IP address; that is how they estimate your city.
+   The returned city and approximate coordinates are cached locally for 24
+   hours.
 4. **Your system timezone** — a fully offline fallback (e.g.
    `America/New_York` → "New York") if everything above fails.
 
@@ -67,8 +72,9 @@ or browsing history, because it has none.
 
 ## Permissions
 
-- **`geolocation`** — used solely to label your local card with a city.
-  You can deny it; the extension falls back to IP or timezone city.
+- **`geolocation`** — used solely to label your local card with a city and
+  calculate its daylight accurately. You can deny it; the extension falls back
+  to IP or timezone city.
 - **Host permissions** for the five domains listed above — required so the
   extension may contact those geolocation/geocoding APIs.
 

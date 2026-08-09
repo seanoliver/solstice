@@ -1,0 +1,153 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const chromeStoreUrl =
+  "https://chromewebstore.google.com/detail/solstice/boegcpnmpagdbebakchpambpfggghjhe";
+const githubUrl = "https://github.com/seanoliver/solstice";
+---
+
+<BaseLayout
+  title="Privacy policy — Solstice"
+  description="How the Solstice Chrome extension handles settings, location, and third-party services."
+>
+  <header class="site-header">
+    <nav class="nav container" aria-label="Main navigation">
+      <a class="brand" href="/" aria-label="Solstice home">
+        <img src="/icon-128.png" alt="" width="30" height="30" />
+        <span>Solstice</span>
+      </a>
+      <div class="nav-actions">
+        <a class="text-link" href={githubUrl}>GitHub</a>
+        <a class="button" href={chromeStoreUrl}>Add to Chrome</a>
+      </div>
+    </nav>
+  </header>
+
+  <main class="policy-main">
+    <article class="policy container">
+      <p class="section-kicker">Plain-language policy</p>
+      <h1>Privacy policy</h1>
+      <p class="updated">Last updated: August 9, 2026</p>
+
+      <p>
+        Solstice is a Chrome new-tab extension that displays a world clock. It
+        has <strong>no servers, no accounts, no analytics, no tracking, and no advertising.</strong>
+        The developer never receives any of your data.
+      </p>
+      <p>
+        This document describes exactly what the extension does with
+        information, because it requests location access and contacts a few
+        third-party services. Everything below is verifiable in the source code.
+      </p>
+
+      <h2>What stays on your device</h2>
+      <p>
+        All of your settings are stored locally in your browser
+        (<code>localStorage</code>) and never leave your machine:
+      </p>
+      <ul>
+        <li>Your list of timezones and cities.</li>
+        <li>Your 12h/24h preference and other view settings.</li>
+        <li>Your manually entered “home” label, if you set one.</li>
+        <li>
+          The most recently detected city name and coordinates for your local
+          card, cached for 24 hours to avoid repeated lookups and calculate
+          local sunrise and sunset times.
+        </li>
+      </ul>
+      <p>Uninstalling the extension, or clearing its site data, removes all of it.</p>
+
+      <h2>Location</h2>
+      <p>To label your local card with a city name, the extension tries, in order:</p>
+      <ol>
+        <li>
+          <strong>A “home” label you typed yourself.</strong> This is fully
+          local and takes priority. If you set it, no location detection or
+          network request happens.
+        </li>
+        <li>
+          <strong>Your browser's Geolocation.</strong> Only if you grant
+          Chrome's permission. Your approximate coordinates are sent once to
+          BigDataCloud's reverse-geocoding API to turn them into a city name.
+          The city and coordinates are cached locally for 24 hours so Solstice
+          can calculate daylight accurately without asking again. They are not
+          sent anywhere else.
+        </li>
+        <li>
+          <strong>Approximate IP-based location.</strong> Used only when
+          Geolocation is denied or unavailable. Solstice requests your city
+          from ipwho.is, ipapi.co, or get.geojs.io. These services can see your
+          IP address as part of the request. The returned city and approximate
+          coordinates are cached locally for 24 hours.
+        </li>
+        <li>
+          <strong>Your system time zone.</strong> A fully offline fallback if
+          everything above fails.
+        </li>
+      </ol>
+      <p>
+        Sunrise and sunset times for the day-night bands are computed locally
+        from each zone's coordinates using an astronomical formula—no network
+        request is involved.
+      </p>
+
+      <h2>Adding a city</h2>
+      <p>
+        When you search for a city to add, your search text is sent to
+        Open-Meteo's free geocoding API to return matching cities and their
+        coordinates. The query is sent only while you are actively typing in
+        the add-city box.
+      </p>
+
+      <h2>Third-party services</h2>
+      <p>These services are contacted only as described above:</p>
+      <ul>
+        <li>
+          <a href="https://www.bigdatacloud.com/privacy-policy">BigDataCloud</a>
+          — reverse geocoding
+        </li>
+        <li>ipwho.is, ipapi.co, and get.geojs.io — IP geolocation fallback</li>
+        <li>
+          <a href="https://open-meteo.com/en/terms">Open-Meteo</a> — city search
+        </li>
+      </ul>
+      <p>
+        Solstice sends them only the minimum needed for the feature: your
+        coordinates, an implicit IP address, or your typed search query. It
+        sends no identifier, account, or browsing history because it has none.
+      </p>
+
+      <h2>Permissions</h2>
+      <ul>
+        <li>
+          <strong><code>geolocation</code></strong> — used solely to label your
+          local card and calculate its daylight. You can deny it; Solstice
+          falls back to IP or your time zone.
+        </li>
+        <li>
+          <strong>Host permissions</strong> — required so the extension may
+          contact the geolocation and geocoding services listed above.
+        </li>
+      </ul>
+
+      <h2>Contact</h2>
+      <p>
+        Questions or concerns? Email
+        <a href="mailto:solstice@seanoliver.dev">solstice@seanoliver.dev</a>
+        or open an issue on the
+        <a href={githubUrl}>GitHub repository</a>.
+      </p>
+    </article>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner container">
+      <span>© 2026 Sean Oliver · Open source under MIT</span>
+      <div class="footer-links">
+        <a href="/">Home</a>
+        <a href={githubUrl}>GitHub</a>
+        <a href="mailto:solstice@seanoliver.dev">Contact</a>
+      </div>
+    </div>
+  </footer>
+</BaseLayout>

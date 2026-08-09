@@ -118,16 +118,27 @@ display order; the `"local"` zone always renders first.
 ## Privacy
 
 No servers, no accounts, no analytics, no tracking. Your settings live in your
-browser. Location, if you allow it, is used only to label your local card with
-a city name and is cached locally. Full details in [PRIVACY.md](PRIVACY.md).
+browser. Location, if you allow it, is used to label your local card and
+calculate its daylight accurately; the detected city and coordinates are
+cached locally for 24 hours. Full details in [PRIVACY.md](PRIVACY.md).
 
 ## Development
 
-No build step — it's vanilla ES modules. Run the unit tests (time model, sun
-math, day-part bands) with:
+The extension has no build step — it uses vanilla ES modules. Run its unit
+tests (time model, sun math, day-part bands) with:
 
 ```bash
 node --test
+```
+
+The public website is an isolated Astro project:
+
+```bash
+cd web
+pnpm install
+pnpm dev       # local server
+pnpm check     # Astro and TypeScript diagnostics
+pnpm build     # static output in web/dist/
 ```
 
 Project layout:
@@ -138,7 +149,8 @@ Project layout:
 - `src/` — `timeModel.js`, `sun.js` (sunrise/sunset), `bands.js`,
   `dayPart.js`, `zones.js` (storage), `geo.js` (location), `layout.js`
   (responsive grid), `cityLookup.js` (remote search), `render.js`.
-- `test/` — `node:test` unit suites. `docs/` — design notes & roadmap.
+- `test/` — `node:test` unit suites. `web/` — Astro website.
+- `docs/` — durable project memory, design notes, and roadmap.
 
 Contributions welcome — see [docs/ROADMAP.md](docs/ROADMAP.md) for ideas.
 

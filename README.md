@@ -10,6 +10,8 @@
 
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/solstice/boegcpnmpagdbebakchpambpfggghjhe"><strong>Install from the Chrome Web Store</strong></a>
+  ·
+  <a href="https://solstice.seanoliver.dev">Website</a>
 </p>
 
 <p align="center">

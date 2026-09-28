@@ -4,7 +4,7 @@
   "version": "1.0.1",
   "description": "A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.",
   "author": "Sean Oliver",
-  "homepage_url": "https://github.com/seanoliver/solstice",
+  "homepage_url": "https://solstice.seanoliver.dev",
   "icons": {
     "16": "assets/icons/icon-16.png",
     "32": "assets/icons/icon-32.png",

@@ -4,3 +4,5 @@ node_modules/
 *.zip
 web/.astro/
 web/dist/
+.vercel/
+.env*.local

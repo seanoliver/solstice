@@ -87,7 +87,8 @@ browser. Open a tab, get your bearings, move on.
 - **Data usage disclosures:** Does NOT collect or transmit personal or usage
   data. No analytics, no remote logging. A detected city and coordinates are
   cached locally for 24 hours to label the local card and calculate daylight.
-- **Privacy policy URL:** `https://github.com/seanoliver/solstice/blob/main/PRIVACY.md`
+- **Privacy policy URL:** `https://solstice.seanoliver.dev/privacy`
+- **Website (Store listing → Additional fields → Official URL / Homepage URL):** `https://solstice.seanoliver.dev`
 
 ## Submission steps **(you)**
 

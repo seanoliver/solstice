@@ -1,86 +1,59 @@
 # Roadmap
 
-Ideas for where this could go. Nothing here is committed work — it's a
-menu, roughly prioritized. Contributions welcome.
+Where Solstice is headed, in order. Work status lives in the linked GitHub
+issues. This file records the order and the reasons for it. Contributions
+welcome.
 
-## Next up (my pick for highest value)
+_Last reviewed: 2026-09-28._
 
-1. **Meeting / overlap finder** — pick a subset of zones, highlight the
-   hours where they're all in the `work` band. The killer feature for a
-   world clock; uniquely useful.
-2. ~~**Drag-to-reorder zones** — the obvious companion to add/remove.~~ Shipped 2026-05-20.
-3. **Publish readiness** — store assets + privacy page (see checklist
-   below). Unblocks shipping to the Chrome Web Store.
+## Now — finish open work
 
-## Features
+1. **CI** — run `node --test` and the `web/` check and build on PRs. [#9](https://github.com/seanoliver/solstice/issues/9)
+2. **Deploy the website** — host `web/`, connect a domain, and point the
+   store listing's privacy link at the hosted page. [#10](https://github.com/seanoliver/solstice/issues/10)
 
-- **Meeting / overlap finder** — common working-hours across selected zones.
-- ~~**Drag-to-reorder zones** in edit mode (persist order in `localStorage`).~~ Shipped 2026-05-20.
-- ~~**Timeline scrub** — drag a playhead to ask "when it's 3pm here, what
-  time is it everywhere?"~~ Shipped 2026-06-05: drag any 24h timeline marker
-  to freeze the whole UI at that instant (snaps to 15 min); "Now" pill + Esc
-  return to live. Design + plan in `docs/plans/2026-06-05-timeline-scrub*.md`.
-- **Per-zone work hours** — override the fixed 9–5 per zone (some people
-  want 8–4, split shifts, etc.). Currently hardcoded in `dayPart.js`.
-- **Click a card to copy** a formatted string ("3:02 PM SF / 11:02 PM
-  London") for async messages.
-- **Settings export/import (JSON)** — move config between machines without
-  needing cross-machine sync.
+## Next — finding a meeting time
 
-## Polish / UX
+This builds on timeline scrub. The goal is to answer "when can we all talk?"
+without mental math.
 
-- **Light mode** + optional accent picker. Palette is centralized in
-  `dayPart.js` / CSS vars, so this is cheap.
-- **Subtle transitions** on add/remove/reorder (currently hard cuts).
-- **Keyboard shortcuts** — `e` edit, `t` 12/24h, `/` focus add-city.
+1. **Per-zone work hours** — replace the hardcoded 9–5 in `src/dayPart.js`
+   and `src/bands.js`. The overlap finder needs it. [#11](https://github.com/seanoliver/solstice/issues/11)
+2. **Overlap finder** — highlight the hours when every selected zone is at
+   work. [#12](https://github.com/seanoliver/solstice/issues/12)
+3. **Copy a scrubbed time** — one click copies "3pm SF / 6pm NY / 11pm
+   London" for a message. [#13](https://github.com/seanoliver/solstice/issues/13)
+
+## Later — ideas, not committed
+
+- **DST warnings** — a small chip on a zone when its clocks change within a
+  few days ("London changes clocks in 4 days").
+- **Keyboard shortcuts** — `e` edit, `t` 12/24h, `/` focus city search.
+- **Light mode** and an optional accent color. The palette is centralized in
+  `src/dayPart.js` and the CSS variables.
+- **Shareable moment links on the website** — a URL that shows one instant
+  across chosen zones, with no install needed. This is the first tool for the
+  website's web app (see `CONTEXT.md`).
+- **Publish to Edge** — the MV3 extension should run unchanged; the work is
+  mostly the store submission.
+- **Settings export/import (JSON)** — move zones between machines.
 - **Twilight gradient** — soft civil-twilight edges instead of hard band
-  boundaries (the original visual ambition, dropped for simplicity).
-
-## Technical / quality
-
-- **E2E / screenshot test** (Playwright) — guards against visual
-  regressions; there's been a lot of CSS iteration done blind.
-- **Backfill bug/investigation journals** in `docs/bugs/` (only the
-  AM/PM-as-night entry exists; the `letter-spacing` and `hour12`/
-  `hourCycle` fixes are worth recording for an OSS repo).
-- **CI** — run `node --test` on PRs.
-- ~~**Local-zone sun bands track geolocation** — currently the geo cascade
-  (`src/geo.js`) only overrides the local card's *label*. Its `lat`/`lon`
-  for the sunrise/sunset computation come from `config.js` and never
-  update, so a user far from the seed coords sees the wrong sun bands on
-  the local card. Should plumb resolved geolocation coords into the local
-  row's `sunTimesUTC` call in `buildModel`.~~ Shipped 2026-07-08: the geo
-  cascade caches detected coords alongside the city and `buildModel` uses
-  them for the local row (`docs/bugs/2026-07-08-local-sun-times-use-seed-coords.md`).
-- ~~**Reduce reflow** — `renderLive` rebuilds the whole DOM every second;
-  fine today, but a diff/update path would be tidier if features grow.~~
-  Shipped 2026-05-21: the 1Hz tick now patches only time-derived nodes in
-  place (`updateLive`); full rebuild only on structural changes.
-
-## Publish to Chrome Web Store — checklist
-
-- [x] Icons: 16 / 32 / 48 / 128 px in `assets/icons/`, wired via `icons` in
-      `manifest.json`. (No `action` — pure new-tab override, a toolbar
-      button would do nothing.)
-- [~] Store listing: copy (name, summary, detailed description, category),
-      three 1280×800 screenshots, and a 440×280 promo tile are all prepared —
-      copy in `docs/chrome-web-store-listing.md`, assets in `assets/store/`.
-      Only the dashboard submission itself remains (needs the dev account).
-- [x] **Privacy policy** — `PRIVACY.md` in repo. Once on GitHub, use the
-      raw/blob URL as the policy link in the Web Store listing.
-- [—] First-run UX: deferred to post-launch (2026-06-06). Neutral default
-      zone set covers the cold start; revisit only if real users get stuck.
-- [x] Manifest hygiene: added `homepage_url` + `author` (2026-06-06).
-      `version` stays `1.0.0` for the first publish.
-- [x] `LICENSE` — MIT.
-- [x] `README`: public-facing rewrite, icon + 2 screenshots, install-from-
-      source, contributions pointer to ROADMAP. (Standalone `CONTRIBUTING.md`
-      still optional.)
-- [x] Remove anything personal from default `config.js` — neutral set
-      (Local + New York + London + Tokyo).
+  boundaries.
+- **Transitions** on add, remove, and reorder.
+- **Screenshot tests** (Playwright) to catch visual regressions in CSS.
 
 ## Non-goals (for now)
 
 - Cross-machine account sync (export/import covers the real need).
-- Calendar integration / event awareness (large scope; different product).
-- Mobile app (this is a new-tab extension by design).
+- Calendar integration or event awareness (large scope; a different product).
+- A mobile app (Solstice is a new-tab extension by design).
+
+## Shipped
+
+- 2026-08-09 — Astro website (landing and privacy pages), not yet hosted.
+- 2026-07-08 — Local card sun times follow detected location (v1.0.1).
+- 2026-06 — Published to the Chrome Web Store (v1.0.0).
+- 2026-06-05 — Timeline scrub: drag any timeline marker to freeze every clock
+  at that instant.
+- 2026-05-21 — 1Hz tick updates only time-derived nodes.
+- 2026-05-20 — Add, remove, reorder, and rename zones; worldwide city search.

@@ -1,0 +1,795 @@
+---
+// Live, in-browser copy of the extension's new tab. Reuses the extension's
+// time and daylight modules (see docs/adr/0002-website-imports-extension-modules.md).
+// Nothing is stored and nothing leaves the page: city search uses only the
+// bundled dataset.
+---
+
+<div class="demo-wrap">
+  <p class="demo-caption">This is Solstice, running on your time.</p>
+
+  <section class="demo" aria-label="Live Solstice demo" data-demo>
+    <div class="demo-clock">
+      <span class="demo-kicker" data-kicker>Your time</span>
+      <span class="demo-big"><span data-big-hm>--:--</span><span class="demo-ap" data-big-ap></span></span>
+      <button type="button" class="demo-now" data-now hidden>Back to now</button>
+    </div>
+    <div class="demo-cards" data-cards></div>
+    <div class="demo-timeline">
+      <span class="demo-timeline-title">24 hour timeline</span>
+      <div class="demo-rows" data-rows></div>
+      <div class="demo-axis" aria-hidden="true">
+        <span></span>
+        <div class="demo-ticks"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div>
+      </div>
+    </div>
+    <noscript>
+      <img
+        class="demo-fallback"
+        src="/screenshots/hero.png"
+        alt="Solstice new tab: a large local clock, four zone cards, and a 24-hour timeline banded by daylight"
+        width="1440"
+        height="1060"
+      />
+    </noscript>
+  </section>
+
+  <div class="tips" data-tips hidden>
+    <span class="tips-label">Try</span>
+    <span class="tip" tabindex="0" data-tip="drag" data-hint="Drag any white marker. Every clock follows. Esc returns to now.">dragging a marker</span>
+    <span class="tip" tabindex="0" data-tip="add" data-hint="Click “+ Add city” and type a city.">adding a city</span>
+    <span class="tip" tabindex="0" data-tip="rename" data-hint="Click a city’s name to rename it, e.g. to a person.">renaming a zone</span>
+    <button type="button" class="tips-hide" aria-label="Hide tips" data-tips-hide>×</button>
+  </div>
+</div>
+
+<script>
+  import { buildModel as buildModelJs, scrubToInstant, formatHM, cityFromTz } from "../../../src/timeModel.js";
+  import { PALETTE } from "../../../src/dayPart.js";
+  import { CITIES } from "../../../cities.js";
+
+  type Part = "night" | "morning" | "work" | "evening";
+  type Zone = { id: number; tz: string; label: string; lat: number; lon: number };
+  type Row = {
+    label: string;
+    tz: string;
+    hour: number;
+    minute: number;
+    minutesOfDay: number;
+    part: Part;
+    segments: { part: Part; startPct: number; widthPct: number }[];
+    dayProgress: number;
+    tzAbbrev: string;
+    dayOffset: number;
+  };
+  // timeModel.js is untyped JS, and TypeScript infers its `= null` defaults
+  // as the parameter types. This is the shape buildModel actually returns.
+  const buildModel = buildModelJs as unknown as (
+    zones: Zone[], at: Date, localLabel: string | null,
+    localCoords: { lat: number; lon: number } | null,
+  ) => Row[];
+
+  const PART_LABEL = {
+    work: "Working hours",
+    morning: "Morning",
+    evening: "Evening",
+    night: "Night",
+  };
+  const DEFAULT_REMOTE = [
+    { name: "New York", tz: "America/New_York", lat: 40.7128, lon: -74.006 },
+    { name: "London", tz: "Europe/London", lat: 51.5074, lon: -0.1278 },
+    { name: "Tokyo", tz: "Asia/Tokyo", lat: 35.6762, lon: 139.6503 },
+    { name: "San Francisco", tz: "America/Los_Angeles", lat: 37.7749, lon: -122.4194 },
+    { name: "Sydney", tz: "Australia/Sydney", lat: -33.8688, lon: 151.2093 },
+  ];
+
+  const root = document.querySelector<HTMLElement>("[data-demo]");
+  if (root) start(root);
+
+  function start(root: HTMLElement) {
+    const localTz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+    // Daylight for the local zone needs coordinates. Use a bundled city in the
+    // visitor's time zone; without one, fall back to the zone's name and the
+    // first default city's coordinates.
+    const localCity = CITIES.find((c) => c.tz === localTz);
+    const localLabel = localCity?.name ?? cityFromTz(localTz);
+    const localCoords = localCity ? { lat: localCity.lat, lon: localCity.lon } : null;
+
+    let nextId = 1;
+    const remote = DEFAULT_REMOTE.filter((c) => c.tz !== localTz).slice(0, 3);
+    let zones: Zone[] = [
+      { id: nextId++, tz: "local", label: localLabel, lat: 40.7128, lon: -74.006 },
+      ...remote.map((c) => ({ id: nextId++, tz: c.tz, label: c.name, lat: c.lat, lon: c.lon })),
+    ];
+    let scrubAt: Date | null = null;
+    let adding = false;
+    let renamingId: number | null = null;
+
+    const el = {
+      kicker: root.querySelector<HTMLElement>("[data-kicker]")!,
+      bigHm: root.querySelector<HTMLElement>("[data-big-hm]")!,
+      bigAp: root.querySelector<HTMLElement>("[data-big-ap]")!,
+      now: root.querySelector<HTMLButtonElement>("[data-now]")!,
+      cards: root.querySelector<HTMLElement>("[data-cards]")!,
+      rows: root.querySelector<HTMLElement>("[data-rows]")!,
+      tips: document.querySelector<HTMLElement>("[data-tips]")!,
+    };
+    el.tips.hidden = false;
+
+    const model = () => {
+      const at = scrubAt ?? new Date();
+      return buildModel(zones, at, localLabel, localCoords);
+    };
+
+    function markTip(name: string) {
+      el.tips.querySelector(`[data-tip="${name}"]`)?.classList.add("done");
+    }
+
+    function h<K extends keyof HTMLElementTagNameMap>(
+      tag: K, cls = "", text = "",
+    ): HTMLElementTagNameMap[K] {
+      const node = document.createElement(tag);
+      if (cls) node.className = cls;
+      if (text) node.textContent = text;
+      return node;
+    }
+
+    // Full rebuild: used when zones, add mode, or rename mode change.
+    function render() {
+      const rows = model();
+      el.cards.replaceChildren(
+        ...rows.map((r, i) => card(r, zones[i])),
+        adding ? addForm() : addButton(),
+      );
+      el.rows.replaceChildren(...rows.map((r, i) => timelineRow(r, zones[i])));
+      update();
+      if (adding) el.cards.querySelector<HTMLInputElement>(".demo-search")?.focus();
+      if (renamingId !== null) el.cards.querySelector<HTMLInputElement>(".demo-rename")?.focus();
+    }
+
+    // In-place update: used by the 1 Hz tick and while dragging, so the
+    // dragged track keeps its pointer capture.
+    function update() {
+      const rows = model();
+      const local = rows[0];
+      const big = formatHM(local.hour, local.minute, "12");
+      el.kicker.textContent = `Your time · ${local.label}`;
+      el.bigHm.textContent = big.hm;
+      el.bigAp.textContent = big.ap;
+      el.now.hidden = scrubAt === null;
+      root.classList.toggle("is-scrubbed", scrubAt !== null);
+
+      rows.forEach((r, i) => {
+        const id = zones[i].id;
+        const c = el.cards.querySelector<HTMLElement>(`[data-card="${id}"]`);
+        if (c) {
+          const t = formatHM(r.hour, r.minute, "12");
+          c.querySelector("[data-hm]")!.textContent = t.hm;
+          c.querySelector("[data-ap]")!.textContent = t.ap;
+          const off = r.dayOffset === 0 ? "" : r.dayOffset > 0 ? ` · +${r.dayOffset}` : ` · −${-r.dayOffset}`;
+          c.querySelector("[data-abbr]")!.textContent = r.tzAbbrev + off;
+          const part = c.querySelector<HTMLElement>("[data-part]")!;
+          part.textContent = PART_LABEL[r.part];
+          part.style.color = r.part === "night" ? "" : PALETTE[r.part];
+        }
+        const row = el.rows.querySelector<HTMLElement>(`[data-row="${id}"]`);
+        if (row) {
+          const track = row.querySelector<HTMLElement>(".demo-bands")!;
+          track.replaceChildren(...r.segments.map((s) => {
+            const seg = h("span");
+            seg.style.width = `${s.widthPct}%`;
+            seg.style.background = PALETTE[s.part];
+            return seg;
+          }));
+          const marker = row.querySelector<HTMLElement>(".demo-marker")!;
+          marker.style.left = `${r.dayProgress * 100}%`;
+          const t = formatHM(r.hour, r.minute, "12");
+          marker.setAttribute("aria-valuenow", String(r.minutesOfDay));
+          marker.setAttribute("aria-valuetext", `${t.hm} ${t.ap} in ${r.label}`);
+        }
+      });
+    }
+
+    function card(r: Row, z: Zone) {
+      const c = h("div", `demo-card${z.tz === "local" ? " is-local" : ""}`);
+      c.dataset.card = String(z.id);
+      c.append(h("span", "demo-abbr"));
+      c.lastElementChild!.setAttribute("data-abbr", "");
+
+      if (renamingId === z.id) {
+        const input = h("input", "demo-rename");
+        input.value = z.label;
+        input.setAttribute("aria-label", `Rename ${z.label}`);
+        const commit = () => {
+          if (renamingId !== z.id) return;
+          const v = input.value.trim();
+          if (v && v !== z.label) {
+            z.label = v;
+            markTip("rename");
+          }
+          renamingId = null;
+          render();
+        };
+        input.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") commit();
+          if (e.key === "Escape") { renamingId = null; render(); }
+        });
+        input.addEventListener("blur", commit);
+        c.append(input);
+      } else {
+        const name = h("button", "demo-name", r.label);
+        name.type = "button";
+        name.title = "Rename";
+        name.addEventListener("click", () => {
+          renamingId = z.id;
+          adding = false;
+          render();
+        });
+        c.append(name);
+      }
+
+      const time = h("span", "demo-time");
+      time.append(h("span"), h("span", "demo-ap"));
+      time.firstElementChild!.setAttribute("data-hm", "");
+      time.lastElementChild!.setAttribute("data-ap", "");
+      c.append(time, h("span", "demo-part"));
+      c.lastElementChild!.setAttribute("data-part", "");
+
+      if (z.tz !== "local") {
+        const x = h("button", "demo-remove", "×");
+        x.type = "button";
+        x.setAttribute("aria-label", `Remove ${r.label}`);
+        x.addEventListener("click", () => {
+          zones = zones.filter((q) => q.id !== z.id);
+          render();
+        });
+        c.append(x);
+      }
+      return c;
+    }
+
+    function addButton() {
+      const b = h("button", "demo-add", "+ Add city");
+      b.type = "button";
+      b.addEventListener("click", () => {
+        adding = true;
+        renamingId = null;
+        render();
+      });
+      return b;
+    }
+
+    function addForm() {
+      const wrap = h("div", "demo-card demo-adding");
+      const label = h("label", "demo-abbr", "Add city");
+      label.htmlFor = "demo-search";
+      const input = h("input", "demo-search");
+      input.id = "demo-search";
+      input.autocomplete = "off";
+      input.placeholder = "Lisbon";
+      const list = h("div", "demo-results");
+      list.setAttribute("role", "listbox");
+
+      const matches = () => {
+        const q = input.value.trim().toLowerCase();
+        if (!q) return [];
+        return CITIES.filter((c) =>
+          c.name.toLowerCase().includes(q)
+          && !zones.some((z) => z.tz === c.tz && z.label === c.name)).slice(0, 5);
+      };
+      const pick = (c: (typeof CITIES)[number]) => {
+        zones = [...zones, { id: nextId++, tz: c.tz, label: c.name, lat: c.lat, lon: c.lon }];
+        adding = false;
+        markTip("add");
+        render();
+      };
+      const paint = () => {
+        list.replaceChildren(...matches().map((c) => {
+          const o = h("button", "demo-result", c.name);
+          o.type = "button";
+          o.setAttribute("role", "option");
+          o.addEventListener("mousedown", (e) => e.preventDefault());
+          o.addEventListener("click", () => pick(c));
+          return o;
+        }));
+      };
+      input.addEventListener("input", paint);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { const first = matches()[0]; if (first) pick(first); }
+        if (e.key === "Escape") { adding = false; render(); }
+      });
+      input.addEventListener("blur", () => {
+        setTimeout(() => { if (adding) { adding = false; render(); } }, 120);
+      });
+      wrap.append(label, input, list);
+      return wrap;
+    }
+
+    function timelineRow(r: Row, z: Zone) {
+      const row = h("div", "demo-row");
+      row.dataset.row = String(z.id);
+      const track = h("div", "demo-track");
+      const bands = h("div", "demo-bands");
+      const marker = h("span", "demo-marker");
+      marker.tabIndex = 0;
+      marker.setAttribute("role", "slider");
+      marker.setAttribute("aria-label", `Time in ${r.label}`);
+      marker.setAttribute("aria-valuemin", "0");
+      marker.setAttribute("aria-valuemax", "1425");
+      track.append(bands, marker);
+      row.append(h("span", "demo-row-label", r.label), track);
+
+      const scrubTo = (pct: number) => {
+        scrubAt = scrubToInstant(scrubAt ?? new Date(), z.tz, pct);
+        markTip("drag");
+        update();
+      };
+      const pctAt = (e: PointerEvent) => {
+        const box = track.getBoundingClientRect();
+        return (e.clientX - box.left) / box.width;
+      };
+      track.addEventListener("pointerdown", (e) => {
+        track.setPointerCapture(e.pointerId);
+        root.classList.add("is-dragging");
+        scrubTo(pctAt(e));
+      });
+      track.addEventListener("pointermove", (e) => {
+        if (track.hasPointerCapture(e.pointerId)) scrubTo(pctAt(e));
+      });
+      const end = () => root.classList.remove("is-dragging");
+      track.addEventListener("pointerup", end);
+      track.addEventListener("pointercancel", end);
+      marker.addEventListener("keydown", (e) => {
+        if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+        e.preventDefault();
+        const current = model().find((m) => m.tz === z.tz && m.label === r.label);
+        const minutes = (current?.minutesOfDay ?? 0) + (e.key === "ArrowRight" ? 15 : -15);
+        scrubTo(minutes / 1440);
+      });
+      return row;
+    }
+
+    function resetScrub() {
+      if (scrubAt === null) return;
+      scrubAt = null;
+      update();
+    }
+
+    el.now.addEventListener("click", resetScrub);
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") resetScrub();
+    });
+    el.tips.querySelector("[data-tips-hide]")!.addEventListener("click", () => {
+      el.tips.hidden = true;
+    });
+
+    render();
+    setInterval(() => { if (scrubAt === null) update(); }, 1000);
+  }
+</script>
+
+<style is:global>
+  .demo-wrap {
+    width: min(100%, 1100px);
+    margin-inline: auto;
+  }
+
+  .demo-caption {
+    margin: 0 0 20px;
+    color: var(--muted);
+    font: 500 12px/1.5 var(--mono);
+    letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  .demo {
+    font-family: var(--mono);
+    user-select: none;
+  }
+
+  .demo-clock {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 36px;
+  }
+
+  .demo-kicker {
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+  }
+
+  .demo-big {
+    font-size: clamp(64px, 12vw, 110px);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-ap {
+    margin-left: 0.25em;
+    color: var(--muted);
+    font-size: 0.2em;
+  }
+
+  .demo.is-scrubbed .demo-big {
+    color: var(--accent);
+  }
+
+  .demo-now {
+    min-height: 32px;
+    border: 1px solid var(--border-bright);
+    border-radius: 999px;
+    padding: 0 14px;
+    background: transparent;
+    color: var(--text);
+    font: 500 12px/1 var(--mono);
+    cursor: pointer;
+  }
+
+  .demo-now[hidden] {
+    display: none;
+  }
+
+  .demo-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 14px;
+  }
+
+  .demo-card {
+    position: relative;
+    display: flex;
+    min-height: 132px;
+    flex-direction: column;
+    gap: 6px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    background: var(--bg-raised);
+  }
+
+  .demo-card.is-local {
+    border-color: var(--accent);
+    background: #0b1a1b;
+  }
+
+  .demo-abbr {
+    color: var(--muted);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .is-local .demo-abbr {
+    color: var(--accent);
+  }
+
+  .demo-name {
+    align-self: flex-start;
+    border: 0;
+    border-radius: 4px;
+    padding: 0;
+    background: none;
+    color: var(--text);
+    font: 500 16px/1.3 var(--sans);
+    text-align: left;
+    cursor: text;
+  }
+
+  .demo-name:hover,
+  .demo-name:focus-visible {
+    text-decoration: underline dotted var(--quiet);
+    text-underline-offset: 4px;
+  }
+
+  .demo-rename,
+  .demo-search {
+    width: 100%;
+    height: 32px;
+    border: 1px solid var(--border-bright);
+    border-radius: 8px;
+    padding: 0 10px;
+    background: var(--bg);
+    color: var(--text);
+    font: 500 14px/1 var(--sans);
+  }
+
+  .demo-time {
+    font-size: 28px;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .demo-time .demo-ap {
+    font-size: 12px;
+  }
+
+  .demo-part {
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .demo-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 26px;
+    height: 26px;
+    border: 1px solid var(--border-bright);
+    border-radius: 50%;
+    background: var(--panel);
+    color: var(--muted);
+    font: 14px/1 var(--mono);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 140ms ease;
+  }
+
+  .demo-card:hover .demo-remove,
+  .demo-remove:focus-visible {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .demo-remove {
+      opacity: 1;
+    }
+  }
+
+  .demo-add {
+    min-height: 132px;
+    border: 1px dashed var(--border-bright);
+    border-radius: 12px;
+    background: transparent;
+    color: var(--muted);
+    font: 500 14px/1 var(--mono);
+    cursor: pointer;
+  }
+
+  .demo-add:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .demo-adding {
+    border-color: var(--accent);
+  }
+
+  .demo-results {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .demo-result {
+    border: 0;
+    border-radius: 6px;
+    padding: 7px 8px;
+    background: none;
+    color: var(--text);
+    font: 14px/1.2 var(--sans);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .demo-result:hover,
+  .demo-result:focus-visible {
+    background: var(--border);
+  }
+
+  .demo-timeline {
+    margin-top: 20px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px 20px;
+    background: var(--bg-raised);
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .demo-timeline-title {
+    display: block;
+    margin-bottom: 18px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .demo-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .demo-row,
+  .demo-axis {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    align-items: center;
+    gap: 24px;
+  }
+
+  .demo-row-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .demo-track {
+    position: relative;
+    height: 12px;
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .demo.is-dragging .demo-track {
+    cursor: grabbing;
+  }
+
+  .demo-bands {
+    display: flex;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 6px;
+  }
+
+  .demo-marker {
+    position: absolute;
+    top: -2px;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 3px var(--bg-raised);
+  }
+
+  .demo-marker:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .demo-axis {
+    margin-top: 12px;
+    color: var(--quiet);
+    font-size: 11px;
+  }
+
+  .demo-ticks {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .demo-fallback {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  .tips {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 18px;
+    color: var(--quiet);
+    font: 500 13px/1 var(--mono);
+  }
+
+  .tips[hidden] {
+    display: none;
+  }
+
+  .tips-label {
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0 12px;
+    color: var(--muted);
+    cursor: default;
+  }
+
+  .tip:hover,
+  .tip:focus-visible {
+    border-color: var(--border-bright);
+    background: var(--panel);
+    color: var(--text);
+    outline: none;
+  }
+
+  .tip::after {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 50%;
+    z-index: 5;
+    width: max-content;
+    max-width: 240px;
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: var(--text);
+    color: var(--bg);
+    content: attr(data-hint);
+    font: 13px/1.45 var(--sans);
+    text-align: center;
+    pointer-events: none;
+    transform: translateX(-50%);
+    display: none;
+  }
+
+  .tip:hover::after,
+  .tip:focus-visible::after {
+    display: block;
+  }
+
+  .tip.done {
+    color: var(--quiet);
+    text-decoration: line-through;
+  }
+
+  .tip.done::before {
+    color: var(--accent);
+    content: "✓";
+  }
+
+  .tips-hide {
+    width: 30px;
+    height: 30px;
+    border: 0;
+    background: none;
+    color: var(--quiet);
+    font: 16px/1 var(--mono);
+    cursor: pointer;
+  }
+
+  .tips-hide:hover {
+    color: var(--text);
+  }
+
+  @media (max-width: 620px) {
+    .demo-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .demo-card,
+    .demo-add {
+      min-height: 116px;
+      padding: 14px;
+    }
+
+    .demo-time {
+      font-size: 22px;
+    }
+
+    .demo-timeline {
+      padding: 18px 16px 16px;
+    }
+
+    .demo-row {
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .demo-axis {
+      grid-template-columns: 84px minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    /* Anchor hints to the whole strip so they stay on screen. */
+    .tip {
+      position: static;
+    }
+  }
+</style>

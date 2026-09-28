@@ -103,6 +103,10 @@ is correct. Vercel issues the TLS certificate automatically after that.
   deployment, or run `vercel -Q ~/.vercel-personal rollback`.
 - `302` from a `*.vercel.app` URL is deployment protection, not an outage.
   Test the custom domain.
+- `403` with `x-vercel-mitigated: challenge` from the custom domain is
+  Vercel's bot protection reacting to repeated scripted requests (about 100
+  `curl` calls in 10 minutes triggered it on 2026-09-28). Browsers pass the
+  challenge. Verify in a browser and stop polling.
 
 ## References
 

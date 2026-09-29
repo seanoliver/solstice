@@ -3,7 +3,9 @@ const RAD = Math.PI / 180;
 function toJulian(date) { return date.valueOf() / 86400000 + 2440587.5; }
 function fromJulian(j) { return new Date((j - 2440587.5) * 86400000); }
 
-export function sunTimesUTC(date, lat, lon) {
+// `altitude` is the sun's angle at the event: -0.833° for sunrise/sunset,
+// -6° for civil dawn/dusk.
+export function sunTimesUTC(date, lat, lon, altitude = -0.833) {
   const J = toJulian(date);
   const n = Math.round(J - 2451545.0 + 0.0008);
   const Jstar = n - lon / 360;
@@ -17,7 +19,7 @@ export function sunTimesUTC(date, lat, lon) {
                  - 0.0069 * Math.sin(2 * lambdaRad);
   const sinDec = Math.sin(lambdaRad) * Math.sin(23.4397 * RAD);
   const cosDec = Math.cos(Math.asin(sinDec));
-  const cosH = (Math.sin(-0.833 * RAD) - Math.sin(lat * RAD) * sinDec)
+  const cosH = (Math.sin(altitude * RAD) - Math.sin(lat * RAD) * sinDec)
              / (Math.cos(lat * RAD) * cosDec);
   if (cosH > 1)  return { sunrise: null, sunset: null, polar: "night" };
   if (cosH < -1) return { sunrise: null, sunset: null, polar: "day" };

@@ -18,14 +18,13 @@ function timeMode(ctx) {
 function stripEl(row, tall) {
   const strip = document.createElement("div");
   strip.className = "strip" + (tall ? " strip-tall" : "");
-  for (const s of row.segments) {
-    const seg = document.createElement("span");
-    seg.className = "seg";
-    seg.style.left = s.startPct + "%";
-    seg.style.width = s.widthPct + "%";
-    seg.style.background = PALETTE[s.part];
-    strip.appendChild(seg);
-  }
+  const seg = document.createElement("span");
+  seg.className = "seg";
+  seg.style.left = "0";
+  seg.style.width = "100%";
+  seg.style.background = "linear-gradient(90deg, " +
+    row.stops.map((s) => `${PALETTE[s.part]} ${s.pct}%`).join(", ") + ")";
+  strip.appendChild(seg);
   // Dim the part of the day that hasn't happened yet.
   const future = document.createElement("span");
   future.className = "future";

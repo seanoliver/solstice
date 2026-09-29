@@ -156,3 +156,19 @@ test("scrubToInstant resolves a spring-forward gap time forward (documented beha
   const t = scrubToInstant(base, tz, (2 * 60 + 15) / 1440);
   assert.equal(minutesInZone(t, tz), 3 * 60 + 15); // 195 min = 03:15
 });
+
+test("buildModel rows carry twilight stops that fade before sunrise", () => {
+  const zones = [{ label: "London", tz: "Europe/London", lat: 51.5072, lon: -0.1276 }];
+  const [row] = buildModel(zones, new Date("2026-09-29T12:00:00Z"));
+  const dawn = row.stops[1], sunrise = row.stops[2];
+  assert.equal(dawn.part, "night");
+  assert.ok(sunrise.pct - dawn.pct > (20 / 1440) * 100, "dawn fade is at least 20 minutes");
+  assert.ok(Math.abs(sunrise.pct - (row.sunriseMin / 1440) * 100) < 1e-6);
+});
+
+test("buildModel keeps the evening band when sunset falls after midnight", () => {
+  const zones = [{ label: "Reykjavik", tz: "Atlantic/Reykjavik", lat: 64.1466, lon: -21.9426 }];
+  const [row] = buildModel(zones, new Date("2026-06-21T12:00:00Z"));
+  assert.equal(row.sunsetMin, 1440);
+  assert.deepEqual(row.segments.map((s) => s.part), ["night", "morning", "work", "evening"]);
+});

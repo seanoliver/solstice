@@ -1,5 +1,5 @@
 import { partOfDay } from "./dayPart.js";
-import { daySegments } from "./bands.js";
+import { daySegments, twilightStops } from "./bands.js";
 import { sunTimesUTC } from "./sun.js";
 
 export function zoneNow(tz, at = new Date()) {
@@ -83,21 +83,37 @@ export function buildModel(zones, at = new Date(), localLabel = null,
     const { hour, minute, label } = zoneNow(z.tz, at);
     const minutesOfDay = hour * 60 + minute;
     const useLocal = z.tz === "local" && coordsOk;
-    const sun = sunTimesUTC(at,
-      useLocal ? localCoords.lat : z.lat,
-      useLocal ? localCoords.lon : z.lon);
+    const lat = useLocal ? localCoords.lat : z.lat;
+    const lon = useLocal ? localCoords.lon : z.lon;
+    const sun = sunTimesUTC(at, lat, lon);
     let sunriseMin = 0, sunsetMin = 1440;
     if (sun.sunrise && sun.sunset) {
       sunriseMin = minutesInZone(sun.sunrise, z.tz);
       sunsetMin = minutesInZone(sun.sunset, z.tz);
+      // Near midsummer at high latitudes sunset (or sunrise) lands on the
+      // neighboring day and wraps; pin it to this day's edge instead.
+      if (sunsetMin < sunriseMin) {
+        if (sunsetMin < 720) sunsetMin = 1440; else sunriseMin = 0;
+      }
     } else if (sun.polar === "night") { sunriseMin = 1441; sunsetMin = 1441; }
+    const civil = sunTimesUTC(at, lat, lon, -6);
+    let dawnMin = null, duskMin = null;
+    if (civil.sunrise && civil.sunset) {
+      dawnMin = minutesInZone(civil.sunrise, z.tz);
+      duskMin = minutesInZone(civil.sunset, z.tz);
+      // Dawn or dusk on the neighboring day wraps around; clamp to this day.
+      if (dawnMin > sunriseMin) dawnMin = 0;
+      if (duskMin < sunsetMin) duskMin = 1440;
+    } else if (civil.polar === "day") { dawnMin = 0; duskMin = 1440; }
+    const segments = daySegments(sunriseMin, sunsetMin);
     const part = partOfDay(minutesOfDay, sunriseMin, sunsetMin);
     return {
       label: z.tz === "local" ? localCity
         : (z.label || z.name || cityFromTz(z.tz)), tz: z.tz,
       hour, minute, label2: label,
       minutesOfDay, sunriseMin, sunsetMin, part,
-      segments: daySegments(sunriseMin, sunsetMin),
+      segments,
+      stops: twilightStops(segments, dawnMin, duskMin),
       dayProgress: minutesOfDay / 1440,
       dateLabel: dateLabel(at, z.tz),
       tzAbbrev: tzAbbrev(at, z.tz),

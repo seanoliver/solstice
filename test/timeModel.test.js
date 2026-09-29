@@ -34,8 +34,10 @@ test("buildModel localCoords override drives the local zone's sun times", () => 
   assert.equal(overridden.sunriseMin, control.sunriseMin);
   assert.equal(overridden.sunsetMin, control.sunsetMin);
   // Without the override the seed coords still apply (and differ from SF).
+  // Compare sunrise: in some system time zones both sunsets fall after
+  // midnight and are pinned to 1440.
   const fallback = buildModel(nycLocal, at)[0];
-  assert.notEqual(fallback.sunsetMin, control.sunsetMin);
+  assert.notEqual(fallback.sunriseMin, control.sunriseMin);
 });
 
 test("buildModel localCoords does not touch non-local zones", () => {

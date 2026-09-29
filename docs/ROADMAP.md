@@ -48,7 +48,7 @@ Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/2
 ## Shipped
 
 - 2026-09-29: DST heads-up: a zone card shows "−1h in 4d" when its clocks
-  change within a week. [#24](https://github.com/seanoliver/solstice/issues/24)
+  change within a week (v1.1.0). [#24](https://github.com/seanoliver/solstice/issues/24)
 - 2026-09-28: The website's home page is the new tab itself, customizable
   and saved in the browser, with an Add to Chrome banner.
 - 2026-09-28: Website live at https://solstice.seanoliver.dev. [#10](https://github.com/seanoliver/solstice/issues/10)

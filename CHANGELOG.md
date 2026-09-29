@@ -5,6 +5,9 @@ separately and is not versioned here.
 
 ## Unreleased
 
+- Cards and timeline rows glide into place when you add, remove, or reorder
+  zones. Off when your system asks for reduced motion.
+- The × on a zone card removes the zone again. It did nothing for most zones.
 - A light theme. Choose System, Light, or Dark in the Edit panel; System
   follows your computer. Night stays dark so the day/night shape stays clear.
 - Pick an accent color (teal, blue, violet, amber, or rose) in the Edit panel.

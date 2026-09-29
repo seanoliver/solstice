@@ -54,6 +54,7 @@ let accent = normalizeAccent(store.getItem("accent"));
 document.documentElement.dataset.accent = accent;
 let theme = normalizeTheme(store.getItem("theme"));
 const systemLight = window.matchMedia("(prefers-color-scheme: light)");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 function applyTheme() {
   document.documentElement.dataset.theme = resolveTheme(theme, systemLight.matches);
 }
@@ -99,14 +100,14 @@ function ctx() {
       zones = addZone(zones, city);
       saveZones(zones, store);
       query = ""; focusSearch = true;
-      paintBar(); paintLive();
+      paintBar(); paintLive({ animate: true });
     },
     onRemove(row) {
       const idx = zones.findIndex(
         (z) => z.tz === row.tz && z.name === row.name);
       zones = removeZone(zones, idx);
       saveZones(zones, store);
-      paintBar(); paintLive();
+      paintBar(); paintLive({ animate: true });
     },
     onHome(value) {
       writeHome(store, value);
@@ -126,7 +127,7 @@ function ctx() {
     onReorder(fromIdx, toIdx) {
       zones = reorderZones(zones, fromIdx, toIdx);
       saveZones(zones, store);
-      paintBar(); paintLive();
+      paintBar(); paintLive({ animate: true });
     },
     onScrub(zoneIdx, pct) {
       const z = zones[zoneIdx];
@@ -176,11 +177,35 @@ function paintBar() { renderEditBar(editbar, ctx()); }
 // Full structural rebuild of `live`. Used on zone/format/edit changes and
 // resize. Wiping the subtree momentarily collapses page height, so preserve
 // scroll position across the swap.
-function paintLive() {
-  const now = scrubAt ?? new Date();
-  const y = window.scrollY;
-  renderLive(buildModel(zones, now, localLabel, localCoords), live, now, ctx());
-  if (window.scrollY !== y) window.scrollTo(0, y);
+let activeTransition = null;
+function paintLive({ animate = false } = {}) {
+  const render = () => {
+    const now = scrubAt ?? new Date();
+    const y = window.scrollY;
+    renderLive(buildModel(zones, now, localLabel, localCoords), live, now, ctx());
+    if (window.scrollY !== y) window.scrollTo(0, y);
+  };
+  // Name elements only during the transition: a named element renders on its own layer.
+  if (animate && document.startViewTransition && !reducedMotion.matches) {
+    const name = (on) => {
+      document.documentElement.classList.toggle("vt-chrome", on);
+      live.querySelectorAll("[data-vt]").forEach((el) => {
+        el.style.viewTransitionName = on ? el.dataset.vt : "";
+      });
+    };
+    activeTransition?.skipTransition();
+    name(true);
+    const t = document.startViewTransition(() => { render(); name(true); });
+    activeTransition = t;
+    // A skipped transition must not clear names the newer one is using.
+    t.finished.finally(() => {
+      if (activeTransition !== t) return;
+      activeTransition = null;
+      name(false);
+    });
+  } else {
+    render();
+  }
 }
 
 // In-place repaint for scrubbing. Patches nodes via updateLive instead of a

@@ -111,6 +111,7 @@ export function buildModel(zones, at = new Date(), localLabel = null,
       label: z.tz === "local" ? localCity
         : (z.label || z.name || cityFromTz(z.tz)), tz: z.tz,
       name: z.name,
+      key: z.tz === "local" ? "local" : `${z.tz}|${z.name ?? z.label ?? ""}`,
       hour, minute, label2: label,
       minutesOfDay, sunriseMin, sunsetMin, part,
       segments,

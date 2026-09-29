@@ -17,6 +17,10 @@ function timeMode(ctx) {
   return ctx && ctx.timeMode === "24" ? "24" : "12";
 }
 
+function transitionName(prefix, key) {
+  return `${prefix}-${key.replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
 function stripEl(row, tall) {
   const strip = document.createElement("div");
   strip.className = "strip" + (tall ? " strip-tall" : "");
@@ -594,6 +598,7 @@ export function renderLive(model, liveEl, now, ctx) {
       const ct = formatHM(r.hour, r.minute, mode);
       const c = document.createElement("article");
       c.className = "card" + (r.tz === "local" ? " card-local" : "");
+      c.dataset.vt = transitionName("card", r.key);
       const head = document.createElement("div");
       head.className = "card-head";
       const dst = dstBadge(r.tz, now);
@@ -644,6 +649,7 @@ export function renderLive(model, liveEl, now, ctx) {
     for (const r of model) {
       const row = document.createElement("div");
       row.className = "tlrow";
+      row.dataset.vt = transitionName("row", r.key);
       const lab = document.createElement("span");
       lab.className = "tllab";
       lab.textContent = r.label;

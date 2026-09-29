@@ -1,0 +1,103 @@
+.cta-banner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.6rem 1rem;
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  font: 12px/1.4 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  text-align: center;
+}
+
+[data-cta-dismissed] .cta-banner {
+  display: none;
+}
+
+.cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #06201d;
+  font: 600 12px/1 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.cta-btn:hover {
+  background: #42dec9;
+}
+
+.cta-btn svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+.cta-close {
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.cta-close:hover {
+  color: var(--txt);
+}
+
+/* Match the 12h/24h toggle's height so the top bar stays the extension's height. */
+.cta-top {
+  flex-shrink: 0;
+  padding-block: 0.35rem;
+}
+
+/* Below this width the button squeezes the top bar, and phones can't install extensions. */
+@media (max-width: 800px) {
+  .cta-top {
+    display: none;
+  }
+}
+
+.web-foot {
+  position: fixed;
+  left: 1.6rem;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  height: 3.3rem;
+}
+
+.web-foot .gh-link {
+  position: static;
+}
+
+/* Keeps the footer links clear of the legend at tablet widths. */
+@media (max-width: 800px) {
+  .web-foot .gh-link span {
+    display: none;
+  }
+}
+
+.web-privacy {
+  color: var(--muted);
+  opacity: 0.45;
+  font: 500 11px/1 "JetBrains Mono", ui-monospace, Menlo, monospace;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: opacity 120ms ease, color 120ms ease;
+}
+
+.web-privacy:hover {
+  opacity: 0.85;
+  color: var(--txt);
+}

@@ -119,10 +119,12 @@ display order; the `"local"` zone always renders first.
 
 ## Privacy
 
-No servers, no accounts, no analytics, no tracking. Your settings live in your
-browser. Location, if you allow it, is used to label your local card and
-calculate its daylight accurately; the detected city and coordinates are
-cached locally for 24 hours. Full details in [PRIVACY.md](PRIVACY.md).
+The extension has no servers, no accounts, no analytics, no tracking. Your
+settings live in your browser. Location, if you allow it, is used to label
+your local card and calculate its daylight accurately; the detected city and
+coordinates are cached locally for 24 hours. The website runs the same new tab, stores its
+settings in that site's `localStorage`, and never detects your location. Full
+details in [PRIVACY.md](PRIVACY.md).
 
 ## Development
 

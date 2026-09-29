@@ -4,7 +4,7 @@ import {
   loadZones, saveZones, addZone, removeZone, renameZone, reorderZones,
 } from "./src/zones.js";
 import {
-  resolveLocalLabel, resolveLocalCoords, needsRefresh, refreshLocation,
+  resolveLocalLabel, resolveLocalCoords, coordsFromTz, needsRefresh, refreshLocation,
   readHome, writeHome,
 } from "./src/geo.js";
 import { CITIES } from "./cities.js";
@@ -36,15 +36,17 @@ function githubLink() {
   return a;
 }
 
-const store = window.localStorage;
+const store = openStore();
+// The website sets data-no-detect: visitors get no location prompt or IP lookup.
+const detect = !("noDetect" in document.documentElement.dataset);
 let zones = loadZones(store);
 let editMode = false;
 let query = "";
 let focusSearch = false;
 // Cascade: manual home > geolocation > IP > (null → buildModel uses tz city)
 let localLabel = resolveLocalLabel(store, null);
-// Detected coords for the local card's sun bands (null → seed coords).
-let localCoords = resolveLocalCoords(store);
+// Local card's sun bands: detected coords, else coords from the system timezone.
+let localCoords = localCoordsNow();
 let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 let scrubAt = null; // null = live; a Date = frozen at that instant
 
@@ -83,7 +85,7 @@ function ctx() {
       writeHome(store, value);
       localLabel = resolveLocalLabel(store, null);
       paintBar(); paintLive();
-      if (needsRefresh(store)) refreshGeo(); // cleared home → re-detect
+      if (detect && needsRefresh(store)) refreshGeo(); // cleared home → re-detect
     },
     onRename(row, value) {
       if (row.tz === "local") { this.onHome(value); return; }
@@ -112,6 +114,34 @@ function ctx() {
       paintLive();
     },
   };
+}
+
+// Blocked or full site storage throws; keep settings in memory so the page still works.
+function openStore() {
+  const mem = new Map();
+  let ls = null;
+  try {
+    ls = window.localStorage;
+    ls.getItem("timeFmt");
+  } catch {
+    ls = null;
+  }
+  return {
+    getItem: (k) => (mem.has(k) ? mem.get(k) : ls ? ls.getItem(k) : null),
+    setItem: (k, v) => {
+      mem.set(k, String(v));
+      try { ls?.setItem(k, v); } catch {}
+    },
+    removeItem: (k) => {
+      mem.set(k, null);
+      try { ls?.removeItem(k); } catch {}
+    },
+  };
+}
+
+function localCoordsNow() {
+  const tz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return resolveLocalCoords(store) ?? coordsFromTz(tz, CITIES);
 }
 
 function paintBar() { renderEditBar(editbar, ctx()); }
@@ -149,7 +179,7 @@ async function refreshGeo() {
   const city = await refreshLocation(store);
   if (city) {
     localLabel = resolveLocalLabel(store, null);
-    localCoords = resolveLocalCoords(store);
+    localCoords = localCoordsNow();
     paintLive();
   }
 }
@@ -160,7 +190,7 @@ setInterval(tick, 1000);
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && scrubAt) { scrubAt = null; paintLive(); }
 });
-if (needsRefresh(store)) refreshGeo();
+if (detect && needsRefresh(store)) refreshGeo();
 
 // Card-grid column count depends on width, so resize needs a full rebuild.
 let resizeRaf;

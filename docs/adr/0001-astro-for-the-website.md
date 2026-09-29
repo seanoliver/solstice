@@ -3,7 +3,7 @@
 **Date:** 2026-08-09
 **Status:** Accepted
 **Decision owners:** Sean Oliver
-**Related:** `docs/plans/2026-08-09-astro-landing-page.md`
+**Related:** `docs/plans/2026-08-09-astro-landing-page.md`. See ADR-0002 for how the home page now reuses the extension's new tab.
 
 ## Context
 

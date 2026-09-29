@@ -1,10 +1,13 @@
 # Privacy Policy
 
-_Last updated: 2026-08-09_
+_Last updated: 2026-09-28_
 
-Solstice is a Chrome new-tab extension that displays a world clock. It has
+Solstice is a Chrome new-tab extension that displays a world clock, and a
+website that runs the same page in your browser. The extension has
 **no servers, no accounts, no analytics, no tracking, and no advertising.**
-The developer never receives any of your data.
+Neither the extension nor the website sends your settings or location to the
+developer. The website is served by Vercel, which receives standard request
+data (see "The Solstice website" below).
 
 This document describes exactly what the extension does with information,
 because it requests location access and contacts a few third-party
@@ -56,6 +59,21 @@ When you search for a city to add, your search text is sent to Open-Meteo's
 free geocoding API to return matching cities and their coordinates. The
 query is only sent while you are actively typing in the add-city box.
 
+## The Solstice website
+
+The website at https://solstice.seanoliver.dev runs the same new tab in your
+browser, so you can try and customize it without installing anything.
+
+- Your settings (timezones, 12h/24h, home label) are stored in that site's
+  `localStorage`, separate from the extension. The site also remembers
+  whether you dismissed its "Add to Chrome" banner.
+- The website does **not** detect your location. It never asks for
+  Geolocation and never makes an IP lookup. The local card uses your system
+  timezone, or a home label you type.
+- City search works as described above: your search text goes to Open-Meteo.
+- The site is hosted on Vercel, which receives standard request data such as
+  your IP address when you load the page. The site has no analytics.
+
 ## Third-party services
 
 These services are contacted only as described above. Each has its own
@@ -64,6 +82,7 @@ privacy policy:
 - **BigDataCloud** (reverse-geocoding) — https://www.bigdatacloud.com/privacy-policy
 - **ipwho.is**, **ipapi.co**, **get.geojs.io** (IP geolocation fallback)
 - **Open-Meteo** (city search) — https://open-meteo.com/en/terms
+- **Vercel** (website hosting only) — https://vercel.com/legal/privacy-policy
 
 The extension sends them only the minimum needed for the feature: your
 coordinates (BigDataCloud), an implicit IP address (IP providers), or your

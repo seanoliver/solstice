@@ -22,6 +22,7 @@ recover the setup if the Vercel project or DNS is lost.
 | Custom domain | `solstice.seanoliver.dev` |
 | DNS | Porkbun (`seanoliver.dev` nameservers are `*.ns.porkbun.com`) |
 | DNS record | `CNAME solstice → 89be18e7ea266c56.vercel-dns-017.com` |
+| Files outside the root directory | Must stay included (the Vercel default). The home page imports `newtab.js` and `newtab.css` from the repository root. No Ignored Build Step may skip builds when only root files change. |
 | Deployment protection | Vercel default: `*.vercel.app` URLs require a Vercel login. The custom domain is public. |
 
 ## Prerequisites
@@ -103,6 +104,10 @@ is correct. Vercel issues the TLS certificate automatically after that.
   deployment, or run `vercel -Q ~/.vercel-personal rollback`.
 - `302` from a `*.vercel.app` URL is deployment protection, not an outage.
   Test the custom domain.
+- `403` with `x-vercel-mitigated: challenge` from the custom domain is
+  Vercel's bot protection reacting to repeated scripted requests (about 100
+  `curl` calls in 10 minutes triggered it on 2026-09-28). Browsers pass the
+  challenge. Verify in a browser and stop polling.
 
 ## References
 

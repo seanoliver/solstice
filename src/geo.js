@@ -90,6 +90,38 @@ export function resolveLocalCoords(storage, now = Date.now()) {
   return null;
 }
 
+// Legacy IANA names some browsers still report, mapped to the names in cities.js.
+const TZ_ALIASES = {
+  "Asia/Calcutta": "Asia/Kolkata",
+  "America/Buenos_Aires": "America/Argentina/Buenos_Aires",
+};
+
+function offsetMinutes(tz, at) {
+  const name = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "longOffset" })
+    .formatToParts(at).find((p) => p.type === "timeZoneName")?.value ?? "";
+  const m = /GMT([+-])(\d{2}):(\d{2})/.exec(name);
+  return m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3])) : 0;
+}
+
+// Offline coords for the local zone when nothing was detected: a bundled city
+// in `tz`, else a longitude from its standard UTC offset at a mid latitude.
+// Rough: far from 40°/-35° the bands can be off by a couple of hours.
+export function coordsFromTz(tz, cities, year = new Date().getFullYear()) {
+  const name = TZ_ALIASES[tz] ?? tz;
+  const city = cities.find((c) => c.tz === name);
+  if (city) return { lat: city.lat, lon: city.lon };
+  try {
+    const jan = offsetMinutes(tz, new Date(Date.UTC(year, 0, 15)));
+    const jul = offsetMinutes(tz, new Date(Date.UTC(year, 6, 15)));
+    // The smaller offset is standard time; DST in January means the south.
+    const std = Math.min(jan, jul);
+    const lat = jan > jul ? -35 : 40;
+    return { lat, lon: ((std / 4 + 540) % 360) - 180 };
+  } catch {
+    return null;
+  }
+}
+
 // True when a network refresh is worthwhile (no manual home, no fresh geo
 // cache with coords). Avoids re-prompting / re-fetching every new tab. A
 // fresh label-only cache (pre-coords format) still refreshes once so the

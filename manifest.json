@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Solstice",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A calm new tab that visualizes daylight and working hours across all your time zones, at a glance.",
   "author": "Sean Oliver",
   "homepage_url": "https://solstice.seanoliver.dev",

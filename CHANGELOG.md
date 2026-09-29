@@ -3,15 +3,15 @@
 Chrome Web Store releases of the Solstice extension. The website deploys
 separately and is not versioned here.
 
-## Unreleased
+## 1.2.0 (2026-09-29)
 
-- Cards and timeline rows glide into place when you add, remove, or reorder
-  zones. Off when your system asks for reduced motion.
-- The × on a zone card removes the zone again. It did nothing for most zones.
 - A light theme. Choose System, Light, or Dark in the Edit panel; System
   follows your computer. Night stays dark so the day/night shape stays clear.
 - Pick an accent color (teal, blue, violet, amber, or rose) in the Edit panel.
 - Day bands fade from night into day across civil dawn and dusk.
+- Cards and timeline rows glide into place when you add, remove, or reorder
+  zones. Off when your system asks for reduced motion.
+- The × on a zone card removes the zone again. It did nothing for most zones.
 - Near midsummer at high latitudes, the evening band no longer disappears
   when the sun sets after midnight.
 

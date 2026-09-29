@@ -1,8 +1,5 @@
 ---
-// Live, in-browser copy of the extension's new tab. Reuses the extension's
-// time and daylight modules (see docs/adr/0002-website-imports-extension-modules.md).
-// Nothing is stored and nothing leaves the page: city search uses only the
-// bundled dataset.
+// No storage and no network requests: city search must stay on the bundled dataset.
 ---
 
 <div class="demo-wrap">
@@ -88,9 +85,6 @@
 
   function start(root: HTMLElement) {
     const localTz = new Intl.DateTimeFormat().resolvedOptions().timeZone;
-    // Daylight for the local zone needs coordinates. Use a bundled city in the
-    // visitor's time zone; without one, fall back to the zone's name and the
-    // first default city's coordinates.
     const localCity = CITIES.find((c) => c.tz === localTz);
     const localLabel = localCity?.name ?? cityFromTz(localTz);
     const localCoords = localCity ? { lat: localCity.lat, lon: localCity.lon } : null;
@@ -134,7 +128,6 @@
       return node;
     }
 
-    // Full rebuild: used when zones, add mode, or rename mode change.
     function render() {
       const rows = model();
       el.cards.replaceChildren(
@@ -147,8 +140,7 @@
       if (renamingId !== null) el.cards.querySelector<HTMLInputElement>(".demo-rename")?.focus();
     }
 
-    // In-place update: used by the 1 Hz tick and while dragging, so the
-    // dragged track keeps its pointer capture.
+    // Call this, not render(), while dragging: a rebuild drops the pointer capture.
     function update() {
       const rows = model();
       const local = rows[0];

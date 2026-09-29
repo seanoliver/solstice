@@ -11,12 +11,7 @@ what makes that glance more useful or calmer.
 
 ## Now
 
-1. **Light mode and accent color**: follow the system theme by default, with
-   an accent picker in the Edit panel. [#26](https://github.com/seanoliver/solstice/issues/26)
-
-## Next
-
-2. **Motion**: transitions on add, remove, and reorder. Zones need in-place
+1. **Motion**: transitions on add, remove, and reorder. Zones need in-place
    updates first, because most changes rebuild the markup. [#27](https://github.com/seanoliver/solstice/issues/27)
 
 Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/21),
@@ -45,6 +40,8 @@ Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/2
 
 ## Shipped
 
+- 2026-09-29: Light theme that follows the system setting, and an accent
+  color picker in the Edit panel. [#26](https://github.com/seanoliver/solstice/issues/26)
 - 2026-09-29: Twilight gradient: night fades into day across civil dawn and
   dusk on every day band. [#25](https://github.com/seanoliver/solstice/issues/25)
 - 2026-09-29: DST heads-up: a zone card shows "−1h in 4d" when its clocks

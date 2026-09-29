@@ -13,6 +13,18 @@
   --danger-bg:#3a2530; --danger:#ff8d8d; --marker:#fff;
   --night:#283142; --morning:#c2873f; --work:#2bb3a3; --evening:#cf7a3a;
   --dst:#c2873f; }
+/* Accent presets (picked in the Edit panel). Also set on each swatch so it
+   previews its own color. */
+[data-accent="teal"] { --accent:#2dd4bf; --on-accent:#06201d; --accent-border:#1d6f67;
+  --local-glow:#0e2b29; --accent-soft:rgba(45,212,191,.12); --accent-soft-hover:rgba(45,212,191,.2); }
+[data-accent="blue"] { --accent:#60a5fa; --on-accent:#06162b; --accent-border:#27507d;
+  --local-glow:#0e1d33; --accent-soft:rgba(96,165,250,.12); --accent-soft-hover:rgba(96,165,250,.2); }
+[data-accent="violet"] { --accent:#a78bfa; --on-accent:#1a1033; --accent-border:#4c3d80;
+  --local-glow:#1b1633; --accent-soft:rgba(167,139,250,.12); --accent-soft-hover:rgba(167,139,250,.2); }
+[data-accent="amber"] { --accent:#fbbf24; --on-accent:#2a1d02; --accent-border:#7a5c14;
+  --local-glow:#2a2110; --accent-soft:rgba(251,191,36,.12); --accent-soft-hover:rgba(251,191,36,.2); }
+[data-accent="rose"] { --accent:#fb7185; --on-accent:#2b0a10; --accent-border:#7d3441;
+  --local-glow:#2e1519; --accent-soft:rgba(251,113,133,.12); --accent-soft-hover:rgba(251,113,133,.2); }
 /* Light theme follows the system setting. Night stays dark so the day/night
    shape reads as clearly as in the dark theme. */
 @media (prefers-color-scheme: light) {
@@ -24,6 +36,16 @@
     --danger-bg:#fbe1e1; --danger:#b42318;
     --night:#2f3b52; --morning:#f2b766; --work:#3fbfae; --evening:#e8875a;
     --dst:#a15c12; }
+  [data-accent="teal"] { --accent:#0e7490; --on-accent:#fff; --accent-border:#8cc3d6;
+    --local-glow:#e1f0f6; --accent-soft:rgba(14,116,144,.1); --accent-soft-hover:rgba(14,116,144,.18); }
+  [data-accent="blue"] { --accent:#2563eb; --on-accent:#fff; --accent-border:#9dbcf5;
+    --local-glow:#e5edfd; --accent-soft:rgba(37,99,235,.1); --accent-soft-hover:rgba(37,99,235,.18); }
+  [data-accent="violet"] { --accent:#6d28d9; --on-accent:#fff; --accent-border:#c1a9f0;
+    --local-glow:#efe8fc; --accent-soft:rgba(109,40,217,.1); --accent-soft-hover:rgba(109,40,217,.18); }
+  [data-accent="amber"] { --accent:#b45309; --on-accent:#fff; --accent-border:#e8c08a;
+    --local-glow:#fbf0df; --accent-soft:rgba(180,83,9,.1); --accent-soft-hover:rgba(180,83,9,.18); }
+  [data-accent="rose"] { --accent:#be123c; --on-accent:#fff; --accent-border:#efa3b3;
+    --local-glow:#fce7ec; --accent-soft:rgba(190,18,60,.1); --accent-soft-hover:rgba(190,18,60,.18); }
 }
 * { box-sizing:border-box; }
 body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
@@ -238,3 +260,12 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .live.scrubbed .big .secs { display:none; }
 /* Only the 24h timeline strips are draggable. */
 .timeline .strip { cursor:ew-resize; touch-action:none; }
+.ep-accent { display:flex; justify-content:space-between; align-items:center;
+  border-top:1px solid var(--border); padding-top:.6rem; }
+.ep-accent-label { font:500 11px/1 "JetBrains Mono",ui-monospace,Menlo,monospace;
+  letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+.ep-swatches { display:flex; gap:.7rem; }
+.swatch { width:18px; height:18px; border-radius:50%; border:0; padding:0;
+  background:var(--accent); cursor:pointer; }
+.swatch[aria-pressed="true"] { box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
+.swatch:focus-visible { outline:2px solid var(--txt); outline-offset:3px; }

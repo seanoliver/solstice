@@ -8,6 +8,7 @@ import {
   readHome, writeHome,
 } from "./src/geo.js";
 import { CITIES } from "./cities.js";
+import { normalizeAccent } from "./src/accent.js";
 
 const app = document.getElementById("app");
 const editbar = document.createElement("div");
@@ -48,6 +49,8 @@ let localLabel = resolveLocalLabel(store, null);
 // Local card's sun bands: detected coords, else coords from the system timezone.
 let localCoords = localCoordsNow();
 let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
+let accent = normalizeAccent(store.getItem("accent"));
+document.documentElement.dataset.accent = accent;
 let scrubAt = null; // null = live; a Date = frozen at that instant
 
 function ctx() {
@@ -62,6 +65,14 @@ function ctx() {
       timeFmt = m;
       store.setItem("timeFmt", m);
       paintLive();
+    },
+    accent,
+    onAccent(name) {
+      accent = normalizeAccent(name);
+      store.setItem("accent", accent);
+      document.documentElement.dataset.accent = accent;
+      paintBar();
+      editbar.querySelector(`.swatch[data-accent="${accent}"]`)?.focus();
     },
     onToggle() {
       editMode = !editMode; query = ""; focusSearch = false;

@@ -13,7 +13,7 @@ The Chrome new-tab experience that shows the user's zones, daylight, working hou
 _Avoid_: Website, landing page
 
 **Website**:
-Solstice's public web presence. It begins as an install-focused landing page and may contain interactive tools over time.
+Solstice's public web presence. Its home page runs the extension's new tab in the browser, with an Add to Chrome call to action. It may contain other interactive tools over time.
 _Avoid_: Marketing site, web app when referring to the whole site
 
 **Web app**:

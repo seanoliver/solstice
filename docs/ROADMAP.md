@@ -6,11 +6,9 @@ welcome.
 
 _Last reviewed: 2026-09-28._
 
-## Now — finish open work
+## Now
 
-1. **CI** — run `node --test` and the `web/` check and build on PRs. [#9](https://github.com/seanoliver/solstice/issues/9)
-2. **Deploy the website** — host `web/`, connect a domain, and point the
-   store listing's privacy link at the hosted page. [#10](https://github.com/seanoliver/solstice/issues/10)
+Nothing in progress. Pick the next item from Next.
 
 ## Next — finding a meeting time
 
@@ -50,7 +48,11 @@ without mental math.
 
 ## Shipped
 
-- 2026-08-09 — Astro website (landing and privacy pages), not yet hosted.
+- 2026-09-28 — The website's home page is the new tab itself, customizable
+  and saved in the browser, with an Add to Chrome banner.
+- 2026-09-28 — Website live at https://solstice.seanoliver.dev. [#10](https://github.com/seanoliver/solstice/issues/10)
+- 2026-09-28 — CI runs extension tests and the website check/build on PRs. [#9](https://github.com/seanoliver/solstice/issues/9)
+- 2026-08-09 — Astro website (landing and privacy pages).
 - 2026-07-08 — Local card sun times follow detected location (v1.0.1).
 - 2026-06 — Published to the Chrome Web Store (v1.0.0).
 - 2026-06-05 — Timeline scrub: drag any timeline marker to freeze every clock

@@ -1,14 +1,12 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const chromeStoreUrl =
-  "https://chromewebstore.google.com/detail/solstice/boegcpnmpagdbebakchpambpfggghjhe";
-const githubUrl = "https://github.com/seanoliver/solstice";
+import { CHROME_STORE_URL as chromeStoreUrl, GITHUB_URL as githubUrl } from "../consts";
 ---
 
 <BaseLayout
   title="Privacy policy — Solstice"
-  description="How the Solstice Chrome extension handles settings, location, and third-party services."
+  description="How the Solstice Chrome extension and website handle settings, location, and third-party services."
 >
   <header class="site-header">
     <nav class="nav container" aria-label="Main navigation">
@@ -27,12 +25,15 @@ const githubUrl = "https://github.com/seanoliver/solstice";
     <article class="policy container">
       <p class="section-kicker">Plain-language policy</p>
       <h1>Privacy policy</h1>
-      <p class="updated">Last updated: August 9, 2026</p>
+      <p class="updated">Last updated: September 28, 2026</p>
 
       <p>
-        Solstice is a Chrome new-tab extension that displays a world clock. It
-        has <strong>no servers, no accounts, no analytics, no tracking, and no advertising.</strong>
-        The developer never receives any of your data.
+        Solstice is a Chrome new-tab extension that displays a world clock, and
+        this website runs the same page in your browser. The extension has
+        <strong>no servers, no accounts, no analytics, no tracking, and no advertising.</strong>
+        Neither the extension nor the website sends your settings or location
+        to the developer. The website is served by Vercel, which receives
+        standard request data (see “The Solstice website” below).
       </p>
       <p>
         This document describes exactly what the extension does with
@@ -99,6 +100,30 @@ const githubUrl = "https://github.com/seanoliver/solstice";
         the add-city box.
       </p>
 
+      <h2>The Solstice website</h2>
+      <p>
+        This website runs the same new tab in your browser, so you can try and
+        customize it without installing anything.
+      </p>
+      <ul>
+        <li>
+          Your settings are stored in this site's <code>localStorage</code>,
+          separate from the extension. The site also remembers whether you
+          dismissed its “Add to Chrome” banner.
+        </li>
+        <li>
+          The website does <strong>not</strong> detect your location. It never
+          asks for Geolocation and never makes an IP lookup. The local card uses
+          your system time zone, or a home label you type.
+        </li>
+        <li>City search works as described above: your search text goes to Open-Meteo.</li>
+        <li>
+          The site is hosted on Vercel, which receives standard request data
+          such as your IP address when you load the page. The site has no
+          analytics.
+        </li>
+      </ul>
+
       <h2>Third-party services</h2>
       <p>These services are contacted only as described above:</p>
       <ul>
@@ -109,6 +134,10 @@ const githubUrl = "https://github.com/seanoliver/solstice";
         <li>ipwho.is, ipapi.co, and get.geojs.io — IP geolocation fallback</li>
         <li>
           <a href="https://open-meteo.com/en/terms">Open-Meteo</a> — city search
+        </li>
+        <li>
+          <a href="https://vercel.com/legal/privacy-policy">Vercel</a> — website
+          hosting only
         </li>
       </ul>
       <p>

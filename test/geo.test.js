@@ -3,8 +3,9 @@ import assert from "node:assert/strict";
 import {
   writeCachedGeo, writeCachedIp, readHome, writeHome,
   resolveLocalLabel, resolveLocalCoords, needsRefresh,
-  resolveCity, fetchCityIP, refreshLocation,
+  resolveCity, fetchCityIP, refreshLocation, coordsFromTz,
 } from "../src/geo.js";
+import { CITIES } from "../cities.js";
 
 function stub() {
   const mem = {};
@@ -156,4 +157,31 @@ test("refreshLocation: geolocation denied → IP fallback caches ip city and coo
   assert.equal(city, "Morgan Hill");
   assert.equal(resolveLocalLabel(s, "TZ"), "Morgan Hill");
   assert.deepEqual(resolveLocalCoords(s), { lat: 37.13, lon: -121.65 });
+});
+
+test("coordsFromTz: bundled city in the timezone", () => {
+  assert.deepEqual(coordsFromTz("Asia/Tokyo", CITIES), { lat: 35.6762, lon: 139.6503 });
+});
+
+test("coordsFromTz: legacy name maps to the bundled city", () => {
+  const c = coordsFromTz("Asia/Calcutta", CITIES);
+  assert.equal(CITIES.find((x) => x.lat === c.lat).tz, "Asia/Kolkata");
+});
+
+test("coordsFromTz: unlisted timezone uses its standard offset", () => {
+  assert.deepEqual(coordsFromTz("Europe/Warsaw", CITIES, 2026), { lat: 40, lon: 15 });
+  assert.deepEqual(coordsFromTz("Asia/Kathmandu", CITIES, 2026), { lat: 40, lon: 86.25 });
+  assert.deepEqual(coordsFromTz("America/Denver", [], 2026), { lat: 40, lon: -105 });
+});
+
+test("coordsFromTz: DST in January puts the zone in the southern hemisphere", () => {
+  assert.deepEqual(coordsFromTz("America/Santiago", [], 2026), { lat: -35, lon: -60 });
+});
+
+test("coordsFromTz: offsets past +12 wrap to the western hemisphere", () => {
+  assert.deepEqual(coordsFromTz("Pacific/Kiritimati", [], 2026), { lat: 40, lon: -150 });
+});
+
+test("coordsFromTz: invalid timezone returns null", () => {
+  assert.equal(coordsFromTz("Not/AZone", []), null);
 });

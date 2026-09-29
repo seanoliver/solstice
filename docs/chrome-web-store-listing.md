@@ -36,37 +36,42 @@ Contains only runtime files + icons — no docs, tests, screenshots, or README.
 
 ```
 Solstice turns your new tab into a calm map of time: a big local clock up top,
-a card for every place you care about, and a 24-hour timeline below — all
-shaded so you can see, at a glance, where daylight and working hours fall
-across your zones.
+a card for every place you care about, and a 24-hour timeline below.
 
-Warm bands are daytime, grey is night, and a teal band marks the 9-to-5 —
-drawn from each city's real sunrise and sunset. So you can tell who's asleep,
-who's mid-morning, and who's already into their evening.
+Day and night bands follow each city's actual sunrise and sunset. Warm is
+daytime, gray is night, and a teal band marks 9-to-5. Night fades into day
+through twilight. You can tell who's asleep, who's mid-morning, and who's
+already into their evening.
 
-• See daylight and working hours at a glance — colored bands trace each city's
-  real day, so the whole timeline reads in a second.
-• Scrub to any moment — drag any timeline marker and every clock jumps to that
-  instant, so you can find an hour that's civil for the whole group.
-• Yours in seconds — add or remove cities, drag to reorder, rename a zone to a
-  person's name, flip the page between 12h and 24h.
-• Quiet by design — muted palette, monospace numerals, nothing blinking for
+• Jump to any time: drag any timeline marker and every clock moves to that
+  time, so you can find an hour that works for the whole group.
+• Daylight saving warnings: a zone shows "−1h in 4d" the week before daylight
+  saving starts or ends.
+• Light, dark, and accent colors: follow your system or pick a theme, then
+  choose from five accent colors.
+• Yours in seconds: add or remove cities, drag to reorder, rename a zone to a
+  person's name, and switch between 12h and 24h.
+• Quiet by design: muted palette, monospace numerals, nothing blinking for
   your attention.
 
-No accounts, no feeds, no analytics, no tracking. Your settings live in your
-browser. Open a tab, get your bearings, move on.
+Solstice has no accounts, feeds, analytics, or tracking. Your settings are
+stored in your browser. Open a tab, get your bearings, move on.
 ```
 
 ## Assets (all prepared in `assets/store/`)
 
 - **Store icon:** `assets/icons/icon-128.png` (128×128).
-- **Screenshots** (1280×800, upload 2–3):
-  - `assets/store/store-hero.png` — the default view.
-  - `assets/store/store-scrub.png` — scrubbed to noon (the timeline-scrub feature).
-  - `assets/store/store-edit.png` — edit panel + add-a-city search.
-- **Small promo tile** (440×280, optional): `assets/store/store-promo.jpg`
+- **Screenshots** (1280×800, upload all 5; the store allows up to 5). Captured
+  from the 1.2.0 package at Wed, Oct 21, 2026, 10:00 in San Francisco, so
+  London shows the daylight saving chip:
+  - `assets/store/store-hero.png`: the default dark view.
+  - `assets/store/store-light.png`: the light theme.
+  - `assets/store/store-scrub.png`: scrubbed to 4:30 PM.
+  - `assets/store/store-edit.png`: Edit panel with theme, accent, and city search.
+  - `assets/store/store-accent.png`: light theme, violet accent, Edit panel open.
+- **Small promo tile** (440×280, required): `assets/store/store-promo.jpg`
   (JPEG — the dashboard rejects PNGs with an alpha channel).
-  Minimal icon-on-dark tile; only needed if Chrome features the extension.
+  Minimal icon-on-dark tile.
 
 ## Privacy tab (required before submission)
 

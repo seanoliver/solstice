@@ -1,0 +1,23 @@
+# Changelog
+
+Chrome Web Store releases of the Solstice extension. The website deploys
+separately and is not versioned here.
+
+## 1.1.0 (2026-09-29)
+
+- A zone card shows a heads-up when its clocks change within a week, for
+  example `−1h in 4d`. Hover for the date.
+- When your location can't be detected, the local card's daylight comes from
+  your system time zone. It used to show New York's.
+- Solstice keeps working when the browser blocks site storage. Settings last
+  until the tab closes.
+- The store listing's homepage link now points to
+  https://solstice.seanoliver.dev.
+
+## 1.0.1 (2026-07-08)
+
+- The local card's sunrise and sunset follow your detected location.
+
+## 1.0.0 (2026-06)
+
+- First Chrome Web Store release.

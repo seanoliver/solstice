@@ -10,6 +10,8 @@
 // All network is optional and cached so it resolves rarely, not per tab.
 // Attempts log under "[geo]".
 
+import { offsetMinutes } from "./dst.js";
+
 const TTL_MS = 24 * 60 * 60 * 1000; // 1 day
 const GEO_KEY = "geoCityV2";
 const IP_KEY = "ipCityV1";
@@ -95,13 +97,6 @@ const TZ_ALIASES = {
   "Asia/Calcutta": "Asia/Kolkata",
   "America/Buenos_Aires": "America/Argentina/Buenos_Aires",
 };
-
-function offsetMinutes(tz, at) {
-  const name = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "longOffset" })
-    .formatToParts(at).find((p) => p.type === "timeZoneName")?.value ?? "";
-  const m = /GMT([+-])(\d{2}):(\d{2})/.exec(name);
-  return m ? (m[1] === "-" ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3])) : 0;
-}
 
 // Offline coords for the local zone when nothing was detected: a bundled city
 // in `tz`, else a longitude from its standard UTC offset at a mid latitude.

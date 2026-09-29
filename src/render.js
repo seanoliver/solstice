@@ -2,6 +2,7 @@ import { PALETTE } from "./dayPart.js";
 import { formatHM } from "./timeModel.js";
 import { gridColumns } from "./layout.js";
 import { searchCitiesRemote } from "./cityLookup.js";
+import { dstBadge } from "./dst.js";
 
 // Module-scoped remote-search state. The panel rebuilds per keystroke; this
 // state survives across renders so the debounce timer and abort controller
@@ -533,8 +534,11 @@ export function renderLive(model, liveEl, now, ctx) {
       c.className = "card" + (r.tz === "local" ? " card-local" : "");
       const head = document.createElement("div");
       head.className = "card-head";
+      const dst = dstBadge(r.tz, now);
       head.innerHTML =
-        `<span class="abbr">${r.tzAbbrev}</span>` +
+        `<span class="abbr">${r.tzAbbrev}` +
+        (dst ? `<span class="dst" title="${dst.title}"> · ${dst.text}</span>` : "") +
+        `</span>` +
         `<i class="dot" style="background:${PALETTE[r.part]}"></i>`;
       const city = document.createElement("div");
       city.className = "city";

@@ -11,16 +11,14 @@ what makes that glance more useful or calmer.
 
 ## Now
 
-1. **DST heads-up**: a chip on a zone whose clocks change within 7 days
-   ("London changes clocks in 4 days"). [#24](https://github.com/seanoliver/solstice/issues/24)
-2. **Twilight gradient**: soft dawn and dusk edges on the day bands instead
+1. **Twilight gradient**: soft dawn and dusk edges on the day bands instead
    of hard color switches. [#25](https://github.com/seanoliver/solstice/issues/25)
 
 ## Next
 
-3. **Light mode and accent color**: follow the system theme by default, with
+2. **Light mode and accent color**: follow the system theme by default, with
    an accent picker in the Edit panel. [#26](https://github.com/seanoliver/solstice/issues/26)
-4. **Motion**: transitions on add, remove, and reorder. Zones need in-place
+3. **Motion**: transitions on add, remove, and reorder. Zones need in-place
    updates first, because most changes rebuild the markup. [#27](https://github.com/seanoliver/solstice/issues/27)
 
 Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/21),
@@ -49,6 +47,8 @@ Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/2
 
 ## Shipped
 
+- 2026-09-29: DST heads-up: a zone card shows "−1h in 4d" when its clocks
+  change within a week. [#24](https://github.com/seanoliver/solstice/issues/24)
 - 2026-09-28: The website's home page is the new tab itself, customizable
   and saved in the browser, with an Add to Chrome banner.
 - 2026-09-28: Website live at https://solstice.seanoliver.dev. [#10](https://github.com/seanoliver/solstice/issues/10)

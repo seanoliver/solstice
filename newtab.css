@@ -25,27 +25,35 @@
   --local-glow:#2a2110; --accent-soft:rgba(251,191,36,.12); --accent-soft-hover:rgba(251,191,36,.2); }
 [data-accent="rose"] { --accent:#fb7185; --on-accent:#2b0a10; --accent-border:#7d3441;
   --local-glow:#2e1519; --accent-soft:rgba(251,113,133,.12); --accent-soft-hover:rgba(251,113,133,.2); }
-/* Light theme follows the system setting. Night stays dark so the day/night
-   shape reads as clearly as in the dark theme. */
+/* Light theme. newtab.js sets data-theme from the Edit panel choice or the
+   system setting. Night stays dark so the day/night shape stays clear. */
+:root[data-theme="light"] { color-scheme:light; --bg:#eef4fa; --panel:#f8fbfe; --border:#d8e3ee;
+  --txt:#102030; --muted:#5f7185; --accent:#0e7490; --on-accent:#fff;
+  --accent-border:#8cc3d6; --local-glow:#e1f0f6;
+  --accent-soft:rgba(14,116,144,.1); --accent-soft-hover:rgba(14,116,144,.18);
+  --track:#dfe8f1; --raised:#dfe8f1; --raised-txt:#243447; --chip-txt:#5f7185;
+  --danger-bg:#fbe1e1; --danger:#b42318;
+  --night:#2f3b52; --morning:#f2b766; --work:#3fbfae; --evening:#e8875a;
+  --dst:#a15c12; }
+[data-theme="light"][data-accent="teal"],
+[data-theme="light"] [data-accent="teal"] { --accent:#0e7490; --on-accent:#fff; --accent-border:#8cc3d6;
+  --local-glow:#e1f0f6; --accent-soft:rgba(14,116,144,.1); --accent-soft-hover:rgba(14,116,144,.18); }
+[data-theme="light"][data-accent="blue"],
+[data-theme="light"] [data-accent="blue"] { --accent:#2563eb; --on-accent:#fff; --accent-border:#9dbcf5;
+  --local-glow:#e5edfd; --accent-soft:rgba(37,99,235,.1); --accent-soft-hover:rgba(37,99,235,.18); }
+[data-theme="light"][data-accent="violet"],
+[data-theme="light"] [data-accent="violet"] { --accent:#6d28d9; --on-accent:#fff; --accent-border:#c1a9f0;
+  --local-glow:#efe8fc; --accent-soft:rgba(109,40,217,.1); --accent-soft-hover:rgba(109,40,217,.18); }
+[data-theme="light"][data-accent="amber"],
+[data-theme="light"] [data-accent="amber"] { --accent:#b45309; --on-accent:#fff; --accent-border:#e8c08a;
+  --local-glow:#fbf0df; --accent-soft:rgba(180,83,9,.1); --accent-soft-hover:rgba(180,83,9,.18); }
+[data-theme="light"][data-accent="rose"],
+[data-theme="light"] [data-accent="rose"] { --accent:#be123c; --on-accent:#fff; --accent-border:#efa3b3;
+  --local-glow:#fce7ec; --accent-soft:rgba(190,18,60,.1); --accent-soft-hover:rgba(190,18,60,.18); }
+/* Before newtab.js sets data-theme, match the system background so a light
+   system doesn't flash dark. */
 @media (prefers-color-scheme: light) {
-  :root { color-scheme:light; --bg:#eef4fa; --panel:#f8fbfe; --border:#d8e3ee;
-    --txt:#102030; --muted:#5f7185; --accent:#0e7490; --on-accent:#fff;
-    --accent-border:#8cc3d6; --local-glow:#e1f0f6;
-    --accent-soft:rgba(14,116,144,.1); --accent-soft-hover:rgba(14,116,144,.18);
-    --track:#dfe8f1; --raised:#dfe8f1; --raised-txt:#243447; --chip-txt:#5f7185;
-    --danger-bg:#fbe1e1; --danger:#b42318;
-    --night:#2f3b52; --morning:#f2b766; --work:#3fbfae; --evening:#e8875a;
-    --dst:#a15c12; }
-  [data-accent="teal"] { --accent:#0e7490; --on-accent:#fff; --accent-border:#8cc3d6;
-    --local-glow:#e1f0f6; --accent-soft:rgba(14,116,144,.1); --accent-soft-hover:rgba(14,116,144,.18); }
-  [data-accent="blue"] { --accent:#2563eb; --on-accent:#fff; --accent-border:#9dbcf5;
-    --local-glow:#e5edfd; --accent-soft:rgba(37,99,235,.1); --accent-soft-hover:rgba(37,99,235,.18); }
-  [data-accent="violet"] { --accent:#6d28d9; --on-accent:#fff; --accent-border:#c1a9f0;
-    --local-glow:#efe8fc; --accent-soft:rgba(109,40,217,.1); --accent-soft-hover:rgba(109,40,217,.18); }
-  [data-accent="amber"] { --accent:#b45309; --on-accent:#fff; --accent-border:#e8c08a;
-    --local-glow:#fbf0df; --accent-soft:rgba(180,83,9,.1); --accent-soft-hover:rgba(180,83,9,.18); }
-  [data-accent="rose"] { --accent:#be123c; --on-accent:#fff; --accent-border:#efa3b3;
-    --local-glow:#fce7ec; --accent-soft:rgba(190,18,60,.1); --accent-soft-hover:rgba(190,18,60,.18); }
+  html:not([data-theme]), html:not([data-theme]) body { background:#eef4fa; }
 }
 * { box-sizing:border-box; }
 body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
@@ -269,3 +277,5 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
   background:var(--accent); cursor:pointer; }
 .swatch[aria-pressed="true"] { box-shadow:0 0 0 2px var(--panel), 0 0 0 4px var(--accent); }
 .swatch:focus-visible { outline:2px solid var(--txt); outline-offset:3px; }
+.ep-theme .fmt-opt { display:inline-flex; align-items:center; padding:.32rem .7rem; }
+.ep-theme svg { width:12px; height:12px; }

@@ -11,10 +11,8 @@ test("normalizeAccent keeps known presets and defaults the rest to teal", () => 
 
 test("every preset has dark and light colors in newtab.css", () => {
   const css = readFileSync(new URL("../newtab.css", import.meta.url), "utf8");
-  const light = css.slice(css.indexOf("@media (prefers-color-scheme: light)"));
   for (const a of ACCENTS) {
-    const rule = `[data-accent="${a}"]`;
-    assert.ok(css.indexOf(rule) < css.indexOf("@media (prefers-color-scheme: light)"), `${a} dark rule`);
-    assert.ok(light.includes(rule), `${a} light rule`);
+    assert.match(css, new RegExp(`^\\[data-accent="${a}"\\] \\{`, "m"), `${a} dark rule`);
+    assert.ok(css.includes(`[data-theme="light"][data-accent="${a}"]`), `${a} light rule`);
   }
 });

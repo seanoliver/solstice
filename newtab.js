@@ -9,6 +9,7 @@ import {
 } from "./src/geo.js";
 import { CITIES } from "./cities.js";
 import { normalizeAccent } from "./src/accent.js";
+import { normalizeTheme, resolveTheme } from "./src/theme.js";
 
 const app = document.getElementById("app");
 const editbar = document.createElement("div");
@@ -51,6 +52,13 @@ let localCoords = localCoordsNow();
 let timeFmt = store.getItem("timeFmt") === "24" ? "24" : "12"; // default 12h
 let accent = normalizeAccent(store.getItem("accent"));
 document.documentElement.dataset.accent = accent;
+let theme = normalizeTheme(store.getItem("theme"));
+const systemLight = window.matchMedia("(prefers-color-scheme: light)");
+function applyTheme() {
+  document.documentElement.dataset.theme = resolveTheme(theme, systemLight.matches);
+}
+applyTheme();
+systemLight.addEventListener("change", applyTheme);
 let scrubAt = null; // null = live; a Date = frozen at that instant
 
 function ctx() {
@@ -65,6 +73,14 @@ function ctx() {
       timeFmt = m;
       store.setItem("timeFmt", m);
       paintLive();
+    },
+    theme,
+    onTheme(name) {
+      theme = normalizeTheme(name);
+      store.setItem("theme", theme);
+      applyTheme();
+      paintBar();
+      editbar.querySelector(`.ep-theme [data-theme="${theme}"]`)?.focus();
     },
     accent,
     onAccent(name) {

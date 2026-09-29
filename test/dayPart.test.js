@@ -22,5 +22,5 @@ test("winter: sunset before 17:00 → no evening (night after work)", () => {
 });
 
 test("palette has a color for every day-part", () => {
-  for (const k of ["night","morning","work","evening"]) assert.match(PALETTE[k], /^#/);
+  for (const k of ["night","morning","work","evening"]) assert.equal(PALETTE[k], `var(--${k})`);
 });

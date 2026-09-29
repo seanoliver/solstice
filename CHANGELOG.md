@@ -5,6 +5,9 @@ separately and is not versioned here.
 
 ## Unreleased
 
+- A light theme. Choose System, Light, or Dark in the Edit panel; System
+  follows your computer. Night stays dark so the day/night shape stays clear.
+- Pick an accent color (teal, blue, violet, amber, or rose) in the Edit panel.
 - Day bands fade from night into day across civil dawn and dusk.
 - Near midsummer at high latitudes, the evening band no longer disappears
   when the sun sets after midnight.

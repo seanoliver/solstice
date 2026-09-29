@@ -1,8 +1,9 @@
+// Band colors are CSS variables so themes can restyle them (see newtab.css).
 export const PALETTE = {
-  night:   "#283142",
-  morning: "#c2873f",
-  work:    "#2bb3a3",
-  evening: "#cf7a3a",
+  night:   "var(--night)",
+  morning: "var(--morning)",
+  work:    "var(--work)",
+  evening: "var(--evening)",
 };
 
 // First match wins (agreed precedence). min/sunrise/sunset in minutes-of-day.

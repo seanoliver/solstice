@@ -23,7 +23,7 @@
   padding: 0.4rem 0.85rem;
   border-radius: 999px;
   background: var(--accent);
-  color: #06201d;
+  color: var(--on-accent);
   font: 600 12px/1 "JetBrains Mono", ui-monospace, Menlo, monospace;
   letter-spacing: 0.04em;
   text-decoration: none;
@@ -31,7 +31,7 @@
 }
 
 .cta-btn:hover {
-  background: #42dec9;
+  background: color-mix(in srgb, var(--accent) 85%, white);
 }
 
 .cta-btn svg {

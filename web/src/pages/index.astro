@@ -14,9 +14,12 @@ import { CHROME_STORE_URL } from "../consts";
     />
     <script is:inline>
       try {
-        if (localStorage.getItem("webCtaDismissed") === "1") {
-          document.documentElement.dataset.ctaDismissed = "";
-        }
+        const root = document.documentElement;
+        if (localStorage.getItem("webCtaDismissed") === "1") root.dataset.ctaDismissed = "";
+        const pref = localStorage.getItem("theme");
+        root.dataset.theme = pref === "light" || pref === "dark" ? pref
+          : matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+        root.dataset.accent = localStorage.getItem("accent") || "teal";
       } catch {}
     </script>
   </head>

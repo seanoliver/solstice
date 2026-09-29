@@ -3,6 +3,8 @@ import { formatHM } from "./timeModel.js";
 import { gridColumns } from "./layout.js";
 import { searchCitiesRemote } from "./cityLookup.js";
 import { dstBadge } from "./dst.js";
+import { ACCENTS } from "./accent.js";
+import { THEMES } from "./theme.js";
 
 // Module-scoped remote-search state. The panel rebuilds per keystroke; this
 // state survives across renders so the debounce timer and abort controller
@@ -64,6 +66,65 @@ function fullDate(now) {
 
 let panelMounted = false;
 
+const THEME_ICONS = {
+  system: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">' +
+    '<rect x="1.5" y="2.5" width="13" height="9" rx="1.5"/><path d="M5.5 14h5"/></svg>',
+  light: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">' +
+    '<circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3 3l1.4 1.4' +
+    'M11.6 11.6L13 13M3 13l1.4-1.4M11.6 4.4L13 3"/></svg>',
+  dark: '<svg viewBox="0 0 16 16" fill="currentColor">' +
+    '<path d="M13.5 10.5A6 6 0 0 1 5.5 2.5a6 6 0 1 0 8 8z"/></svg>',
+};
+
+function buildTheme(ctx) {
+  const row = document.createElement("div");
+  row.className = "ep-accent";
+  const label = document.createElement("span");
+  label.className = "ep-accent-label";
+  label.textContent = "Theme";
+  const group = document.createElement("div");
+  group.className = "fmt ep-theme";
+  group.setAttribute("role", "group");
+  group.setAttribute("aria-label", "Theme");
+  for (const name of THEMES) {
+    const b = document.createElement("button");
+    b.className = "fmt-opt" + (ctx.theme === name ? " on" : "");
+    b.dataset.theme = name;
+    b.title = name[0].toUpperCase() + name.slice(1);
+    b.setAttribute("aria-label", `${b.title} theme`);
+    b.setAttribute("aria-pressed", String(ctx.theme === name));
+    b.innerHTML = THEME_ICONS[name];
+    b.addEventListener("click", () => ctx.onTheme(name));
+    group.appendChild(b);
+  }
+  row.append(label, group);
+  return row;
+}
+
+function buildAccent(ctx) {
+  const row = document.createElement("div");
+  row.className = "ep-accent";
+  const label = document.createElement("span");
+  label.className = "ep-accent-label";
+  label.textContent = "Accent";
+  const swatches = document.createElement("div");
+  swatches.className = "ep-swatches";
+  swatches.setAttribute("role", "group");
+  swatches.setAttribute("aria-label", "Accent color");
+  for (const name of ACCENTS) {
+    const b = document.createElement("button");
+    b.className = "swatch";
+    b.dataset.accent = name;
+    b.title = name[0].toUpperCase() + name.slice(1);
+    b.setAttribute("aria-label", `${b.title} accent`);
+    b.setAttribute("aria-pressed", String(ctx.accent === name));
+    b.addEventListener("click", () => ctx.onAccent(name));
+    swatches.appendChild(b);
+  }
+  row.append(label, swatches);
+  return row;
+}
+
 export function renderEditBar(barEl, ctx) {
   barEl.innerHTML = "";
   barEl.className = "editbar";
@@ -107,6 +168,8 @@ function buildEditPanel(ctx) {
   attachDrag(list, ctx);
   panel.appendChild(list);
 
+  panel.appendChild(buildTheme(ctx));
+  panel.appendChild(buildAccent(ctx));
   panel.appendChild(buildSearch(ctx));
 
   const done = document.createElement("button");

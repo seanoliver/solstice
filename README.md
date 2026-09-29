@@ -78,7 +78,7 @@ once. Everything you change persists locally between tabs.
 ## Scrub to any moment
 
 <p align="center">
-  <img src="assets/screenshots/scrub.png" width="820" alt="Solstice scrubbed to noon — the big clock, every card, and every timeline frozen at the same instant, with a pause pill in the top-right showing the scrubbed time" />
+  <img src="assets/screenshots/scrub.png" width="820" alt="Solstice scrubbed to 4:30 PM — the big clock, every card, and every timeline frozen at the same instant, with a pause pill in the top-right showing the scrubbed time" />
 </p>
 
 Planning a call? Grab the marker on any timeline row and drag. The big local

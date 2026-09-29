@@ -3,6 +3,10 @@
 Chrome Web Store releases of the Solstice extension. The website deploys
 separately and is not versioned here.
 
+## Unreleased
+
+- Card text no longer shows twice while cards resize during an animation.
+
 ## 1.2.0 (2026-09-29)
 
 - A light theme. Choose System, Light, or Dark in the Edit panel; System

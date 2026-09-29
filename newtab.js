@@ -191,6 +191,7 @@ function paintLive({ animate = false } = {}) {
       document.documentElement.classList.toggle("vt-chrome", on);
       live.querySelectorAll("[data-vt]").forEach((el) => {
         el.style.viewTransitionName = on ? el.dataset.vt : "";
+        el.style.viewTransitionClass = on ? "zone" : "";
       });
     };
     activeTransition?.skipTransition();

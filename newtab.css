@@ -281,6 +281,16 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 .ep-theme svg { width:12px; height:12px; }
 ::view-transition-old(root), ::view-transition-new(root) { animation:none; }
 ::view-transition-group(*) { animation-duration:250ms; animation-timing-function:ease-out; }
+/* A zone on both sides of a change would otherwise crossfade two sizes of its
+   text; show only the new snapshot. Added and removed zones still fade. */
+::view-transition-old(*.zone) { display:none; }
+::view-transition-group(*.zone) { overflow:clip; }
+::view-transition-new(*.zone) { animation:none; block-size:100%;
+  object-fit:none; object-position:left top; }
+::view-transition-old(*.zone):only-child { display:block; animation:vt-fade-out 250ms ease-out both; }
+::view-transition-new(*.zone):only-child { animation:vt-fade-in 250ms ease-out both; }
+@keyframes vt-fade-in { from { opacity:0; } }
+@keyframes vt-fade-out { to { opacity:0; } }
 .vt-chrome .editbar { view-transition-name:editbar; }
 .vt-chrome .editpanel { view-transition-name:editpanel; }
 .vt-chrome .legend { view-transition-name:legend; }

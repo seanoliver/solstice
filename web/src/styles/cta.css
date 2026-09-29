@@ -101,3 +101,20 @@
   opacity: 0.85;
   color: var(--txt);
 }
+
+.vt-chrome .web-foot {
+  view-transition-name: web-foot;
+}
+
+::view-transition-group(web-foot),
+::view-transition-new(web-foot) {
+  animation: none;
+}
+
+::view-transition-group(web-foot) {
+  z-index: 1;
+}
+
+::view-transition-old(web-foot) {
+  display: none;
+}

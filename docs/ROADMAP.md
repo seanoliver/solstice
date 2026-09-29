@@ -11,8 +11,7 @@ what makes that glance more useful or calmer.
 
 ## Now
 
-1. **Motion**: transitions on add, remove, and reorder. Zones need in-place
-   updates first, because most changes rebuild the markup. [#27](https://github.com/seanoliver/solstice/issues/27)
+Nothing in progress. Pick the next item from Later.
 
 Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/21),
 [#22](https://github.com/seanoliver/solstice/issues/22), and
@@ -40,6 +39,8 @@ Pick up the small fixes in [#21](https://github.com/seanoliver/solstice/issues/2
 
 ## Shipped
 
+- 2026-09-29: Motion: cards and timeline rows glide into place when zones
+  are added, removed, or reordered. [#27](https://github.com/seanoliver/solstice/issues/27)
 - 2026-09-29: Light theme (System, Light, or Dark) and an accent color
   picker in the Edit panel. [#26](https://github.com/seanoliver/solstice/issues/26)
 - 2026-09-29: Twilight gradient: night fades into day across civil dawn and

@@ -174,3 +174,9 @@ test("buildModel keeps the evening band when sunset falls after midnight", () =>
   assert.equal(row.sunsetMin, 1440);
   assert.deepEqual(row.segments.map((s) => s.part), ["night", "morning", "work", "evening"]);
 });
+
+test("buildModel rows carry the zone's name so card actions can find the zone", () => {
+  const zones = [{ label: "Paris", name: "Paris", tz: "Europe/Paris", lat: 48.8566, lon: 2.3522 }];
+  const [row] = buildModel(zones, new Date("2026-09-29T12:00:00Z"));
+  assert.equal(row.name, "Paris");
+});

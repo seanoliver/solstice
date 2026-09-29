@@ -291,3 +291,5 @@ body { margin:0; min-height:100vh; background:var(--bg); color:var(--txt);
 ::view-transition-new(legend), ::view-transition-new(gh-link) { animation:none; }
 ::view-transition-old(editbar), ::view-transition-old(editpanel),
 ::view-transition-old(legend), ::view-transition-old(gh-link) { display:none; }
+::view-transition-group(editbar), ::view-transition-group(editpanel),
+::view-transition-group(legend), ::view-transition-group(gh-link) { z-index:1; }

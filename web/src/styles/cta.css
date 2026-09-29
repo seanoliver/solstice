@@ -111,6 +111,10 @@
   animation: none;
 }
 
+::view-transition-group(web-foot) {
+  z-index: 1;
+}
+
 ::view-transition-old(web-foot) {
   display: none;
 }

@@ -3,6 +3,12 @@
 Chrome Web Store releases of the Solstice extension. The website deploys
 separately and is not versioned here.
 
+## Unreleased
+
+- Day bands fade from night into day across civil dawn and dusk.
+- Near midsummer at high latitudes, the evening band no longer disappears
+  when the sun sets after midnight.
+
 ## 1.1.0 (2026-09-29)
 
 - A zone card shows a heads-up when its clocks change within a week, for

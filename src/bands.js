@@ -24,3 +24,24 @@ export function daySegments(sunriseMin, sunsetMin) {
     widthPct: ((s.b - s.a) / 1440) * 100,
   }));
 }
+
+// Gradient stops for a strip: night fades into day from civil dawn to sunrise,
+// and back from sunset to civil dusk. Other boundaries stay hard. A null dawn
+// or dusk keeps that edge hard.
+export function twilightStops(segments, dawnMin, duskMin) {
+  const pct = (m) => Math.min(100, Math.max(0, (m / 1440) * 100));
+  const stops = [{ part: segments[0].part, pct: 0 }];
+  for (let i = 1; i < segments.length; i++) {
+    const prev = segments[i - 1], seg = segments[i];
+    const p = seg.startPct;
+    let from = p, to = p;
+    if (prev.part === "night" && seg.part !== "night" && dawnMin != null) {
+      from = Math.min(p, Math.max(prev.startPct, pct(dawnMin)));
+    } else if (prev.part !== "night" && seg.part === "night" && duskMin != null) {
+      to = Math.max(p, Math.min(seg.startPct + seg.widthPct, pct(duskMin)));
+    }
+    stops.push({ part: prev.part, pct: from }, { part: seg.part, pct: to });
+  }
+  stops.push({ part: segments[segments.length - 1].part, pct: 100 });
+  return stops;
+}

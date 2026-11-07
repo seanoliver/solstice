@@ -1,0 +1,11 @@
+{
+  "name": "solstice-promo",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "render": "node record.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

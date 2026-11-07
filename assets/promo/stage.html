@@ -1,0 +1,84 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Solstice promo</title><style>
+@font-face{font-family:JB;src:url(../fonts/jetbrains-mono.woff2)}
+*{box-sizing:border-box}
+html,body{margin:0;width:1920px;height:1080px;overflow:hidden;background:#0a0d12}
+#bg{position:absolute;inset:0;background:radial-gradient(110% 110% at 82% 18%,#12303a 0%,#0a0d12 58%);transition:background 900ms ease}
+body.light #bg{background:radial-gradient(110% 110% at 82% 18%,#d9ecf5 0%,#eef4fa 58%)}
+.copy{position:absolute;left:120px;top:0;height:1080px;width:600px;display:flex;flex-direction:column;justify-content:center;color:#e8edf2;transition:color 600ms}
+body.light .copy{color:#102030}
+.k{font:600 18px/1 JB;letter-spacing:.22em;color:#2dd4bf;opacity:0;transform:translateY(14px);transition:all 500ms ease}
+.h{font:700 76px/1.02 system-ui,-apple-system,sans-serif;letter-spacing:-.025em;margin:22px 0 22px;opacity:0;transform:translateY(22px);transition:all 600ms cubic-bezier(.2,.7,.2,1) 80ms}
+.p{font:26px/1.45 system-ui,-apple-system,sans-serif;color:#9aa4b2;opacity:0;transform:translateY(22px);transition:all 600ms cubic-bezier(.2,.7,.2,1) 180ms}
+body.light .p{color:#5f7185}
+.show .k,.show .h,.show .p{opacity:1;transform:none}
+.hide .k,.hide .h,.hide .p{opacity:0;transform:translateY(-16px);transition-delay:0ms;transition-duration:300ms}
+#stageWin{position:absolute;left:790px;top:170px;width:1040px;height:700px;perspective:2200px;transition:opacity 700ms ease}
+.win{position:absolute;inset:0;border-radius:18px;overflow:hidden;border:1px solid #243041;background:#0a0d12;box-shadow:0 40px 110px rgba(0,0,0,.6);transform:rotateY(-9deg);transform-origin:0% 50%;transition:transform 900ms cubic-bezier(.2,.7,.2,1),border-color 600ms,box-shadow 600ms}
+body.light .win{border-color:#c9d6e3;box-shadow:0 40px 110px rgba(40,60,90,.25)}
+.bar{height:38px;background:#11161e;display:flex;gap:9px;align-items:center;padding-left:16px;transition:background 600ms}
+body.light .bar{background:#dfe8f1}
+.bar i{width:12px;height:12px;border-radius:50%;background:#2a3342}
+body.light .bar i{background:#b8c6d4}
+.view{position:absolute;top:38px;left:0;width:1040px;height:662px;overflow:hidden}
+.zoom{position:absolute;left:0;top:0;width:1440px;height:917px;transform-origin:0 0;transform:scale(.7222);transition:transform 1100ms cubic-bezier(.2,.7,.2,1)}
+iframe{width:1440px;height:917px;border:0;display:block}
+.chip{position:absolute;padding:12px 18px;border-radius:999px;font:600 22px JB;opacity:0;transform:scale(.8);transition:all 450ms cubic-bezier(.3,1.4,.5,1)}
+.chip.on{opacity:1;transform:none}
+#dstChip{z-index:2;left:0;top:0;background:#c2873f;color:#1b1206;box-shadow:0 10px 30px rgba(194,135,63,.45)}
+#title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8edf2;transition:opacity 700ms}
+#title .brand{font:600 30px JB;letter-spacing:.3em;display:flex;align-items:center;gap:18px;opacity:0;transform:translateY(10px);transition:all 700ms}
+#title .brand i{width:16px;height:16px;border-radius:50%;background:#2dd4bf;box-shadow:0 0 24px #2dd4bf}
+#title h1{font:800 120px/1 system-ui,-apple-system,sans-serif;letter-spacing:-.04em;margin:34px 0 20px;opacity:0;transform:translateY(20px);transition:all 800ms cubic-bezier(.2,.7,.2,1) 150ms}
+#title p{font:30px system-ui;color:#9aa4b2;margin:0;opacity:0;transform:translateY(20px);transition:all 800ms cubic-bezier(.2,.7,.2,1) 300ms}
+#title.show .brand,#title.show h1,#title.show p{opacity:1;transform:none}
+#end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#e8edf2;opacity:0;transition:opacity 700ms}
+#end.show{opacity:1}
+#end h1{font:800 110px/1 system-ui;letter-spacing:-.04em;margin:0 0 30px}
+#end .url{font:600 40px JB;color:#2dd4bf;padding:18px 34px;border:2px solid #1d6f67;border-radius:999px}
+#end p{font:24px JB;color:#7c8593;margin:34px 0 0;letter-spacing:.06em}
+
+@keyframes drift{from{transform:translateY(10px)}to{transform:translateY(-14px)}}
+@keyframes float{0%{transform:translate3d(0,8px,0) rotateX(.6deg)}100%{transform:translate3d(-10px,-10px,0) rotateX(-.6deg)}}
+@keyframes breathe{0%{transform:scale(1) translate(0,0)}100%{transform:scale(1.12) translate(-3%,2%)}}
+@keyframes push{from{transform:scale(1)}to{transform:scale(1.06)}}
+.drift{animation:drift 5.2s ease-in-out infinite alternate}
+.float{position:absolute;inset:0;transform-style:preserve-3d;animation:float 6.5s ease-in-out infinite alternate}
+#bg{animation:breathe 14s ease-in-out infinite alternate;transform-origin:70% 30%}
+.push{display:flex;flex-direction:column;align-items:center;animation:push 7s cubic-bezier(.3,0,.3,1) forwards}
+.hidden{opacity:0!important}
+#title,#end,.copy,.chip,#bg{pointer-events:none}
+</style></head><body>
+<div id="bg"></div>
+<div id="title"><div class="push"><div class="brand"><i></i>SOLSTICE</div><h1 id="tH"></h1><p id="tP"></p></div></div>
+<div class="copy" id="copy"><div class="drift"><div class="k" id="k"></div><div class="h" id="h"></div><div class="p" id="p"></div></div></div>
+<div id="stageWin" class="hidden"><div class="float"><div class="chip" id="dstChip"></div><div class="win" id="win"><div class="bar"><i></i><i></i><i></i></div><div class="view"><div class="zoom" id="zoom"><iframe id="app" src="../../newtab.html"></iframe></div></div></div></div></div>
+<div id="end"><div class="push"><h1 id="eH"></h1><div class="url" id="eU"></div><p id="eP"></p></div></div>
+<script>
+const $ = (id) => document.getElementById(id);
+window.stage = {
+  title(t) { $('tH').textContent = t.h; $('tP').textContent = t.p; $('title').classList.add('show'); },
+  hideTitle() { $('title').classList.add('hidden'); $('stageWin').classList.remove('hidden'); },
+  async beat(b) {
+    const c = $('copy');
+    if (c.classList.contains('show')) { c.classList.replace('show', 'hide'); await new Promise(r => setTimeout(r, 350)); }
+    $('k').textContent = b.k; $('h').textContent = b.h; $('p').textContent = b.p;
+    c.classList.remove('hide'); void c.offsetWidth; c.classList.add('show');
+  },
+  zoom(s, x, y, tilt = -9) { $('zoom').style.transform = `translate(${x}px,${y}px) scale(${s})`; $('win').style.transform = `rotateY(${tilt}deg)`; },
+  focusCity(city, s) {
+    const doc = document.getElementById('app').contentDocument;
+    const card = [...doc.querySelectorAll('.card')].find(c => c.querySelector('.city')?.textContent === city);
+    const r = card.getBoundingClientRect();
+    const tx = 520 - (r.left + r.width / 2) * s, ty = 110 - (r.top + r.height / 2) * s;
+    stage.zoom(s, tx, ty, 0);
+    const abbr = card.querySelector('.dst') || card.querySelector('.abbr');
+    const a = abbr.getBoundingClientRect(), win = document.querySelector('.view').getBoundingClientRect();
+    return { x: win.left + tx + (a.left + a.width / 2) * s, y: win.top + ty + a.top * s };
+  },
+  chipAt(text, x, y) { const e = $('dstChip'), o = $('stageWin').getBoundingClientRect(); e.textContent = text; e.style.left = (x - o.left - 90) + 'px'; e.style.top = (y - o.top - 78) + 'px'; e.classList.add('on'); },
+  chip(text, on) { const e = $('dstChip'); e.textContent = text; e.classList.toggle('on', on); },
+  light(on) { document.body.classList.toggle('light', on); },
+  accent(color) { document.querySelector('#title .brand i').style.background = color; },
+  end(e) { $('copy').classList.replace('show', 'hide'); $('stageWin').classList.add('hidden'); $('dstChip').classList.remove('on'); $('eH').textContent = e.h; $('eU').textContent = e.url; $('eP').textContent = e.p; $('end').classList.add('show'); },
+};
+</script></body></html>
